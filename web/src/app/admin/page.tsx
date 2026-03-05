@@ -7,7 +7,7 @@ import { api } from '@/lib/api';
 import toast from 'react-hot-toast';
 
 export default function AdminDashboard() {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
   const router = useRouter();
   const [stats, setStats] = useState<any>(null);
   const [activeTab, setActiveTab] = useState<'dashboard' | 'promos' | 'campaigns'>('dashboard');
@@ -17,24 +17,33 @@ export default function AdminDashboard() {
   });
 
   useEffect(() => {
+    if (loading) return; // Wait for auth to finish loading
     if (!user || user.role !== 'admin') {
       router.push('/');
       return;
     }
-    // Fetch dashboard stats using the fetcher
-    fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/api/admin/dashboard`, {
+    // Fetch dashboard stats via proxy
+    fetch('/api/admin/dashboard', {
       headers: { Authorization: `Bearer ${api.getToken()}` },
     })
       .then((r) => r.json())
       .then(setStats)
       .catch(() => {});
-  }, [user, router]);
+  }, [user, loading, router]);
+
+  if (loading) {
+    return (
+      <div className="flex justify-center py-20">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600" />
+      </div>
+    );
+  }
 
   if (!user || user.role !== 'admin') return null;
 
   const createPromo = async () => {
     try {
-      await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/api/admin/promos`, {
+      await fetch('/api/admin/promos', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
