@@ -92,24 +92,35 @@ export class BookingsService {
       throw new BadRequestException('Booking cannot be cancelled');
     }
 
-    // Cancel with supplier
+    // Cancel with supplier if there's a supplier booking reference
     if (booking.supplierBookingRef) {
       const adapter = this.supplierRegistry.getAdapter(booking.supplierId);
       if (adapter) {
-        await adapter.cancelBooking(booking.supplierBookingRef);
+        try {
+          await adapter.cancelBooking(booking.supplierBookingRef);
+        } catch (error) {
+          this.logger.warn(`Supplier cancellation failed for ${bookingId}: ${error}`);
+        }
       }
     }
 
-    // Reverse loyalty points only if booking was confirmed and has earned points
-    if (booking.status === BookingStatus.CONFIRMED && booking.loyaltyPointsEarned > 0) {
-      const user = await this.loyaltyService.getBalance(booking.userId);
-      if (user >= booking.loyaltyPointsEarned) {
-        await this.loyaltyService.deductPoints(
-          booking.userId,
-          booking.loyaltyPointsEarned,
-          bookingId,
-          `Points reversed for cancelled booking ${bookingId}`,
-        );
+    // Reverse loyalty points only for confirmed bookings where points were awarded
+    const wasConfirmed = booking.status === BookingStatus.CONFIRMED;
+    if (wasConfirmed && booking.loyaltyPointsEarned > 0) {
+      try {
+        const currentBalance = await this.loyaltyService.getBalance(booking.userId);
+        if (currentBalance >= booking.loyaltyPointsEarned) {
+          await this.loyaltyService.deductPoints(
+            booking.userId,
+            booking.loyaltyPointsEarned,
+            bookingId,
+            `Points reversed for cancelled booking ${bookingId}`,
+          );
+        } else {
+          this.logger.warn(`Skipping loyalty reversal for ${bookingId}: insufficient balance (${currentBalance} < ${booking.loyaltyPointsEarned})`);
+        }
+      } catch (error) {
+        this.logger.warn(`Could not reverse loyalty points for booking ${bookingId}: ${error}`);
       }
     }
 

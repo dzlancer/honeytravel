@@ -27,7 +27,7 @@ export class SupplierRegistryService implements OnModuleInit {
   private async loadAdapters() {
     // Always register the mock adapter for development/demo
     const mockAdapter = new MockHotelAdapter();
-    mockAdapter.initialize({}, {});
+    mockAdapter.initialize({});
     this.adapters.set('mock-hotel', mockAdapter);
     this.logger.log('Loaded built-in mock-hotel adapter');
 
