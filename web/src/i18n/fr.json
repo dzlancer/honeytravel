@@ -1,0 +1,73 @@
+{
+  "common": {
+    "appName": "Travel Shop Algérie",
+    "search": "Rechercher",
+    "login": "Connexion",
+    "register": "S'inscrire",
+    "logout": "Déconnexion",
+    "profile": "Profil",
+    "myBookings": "Mes Réservations",
+    "home": "Accueil",
+    "loading": "Chargement...",
+    "error": "Une erreur est survenue",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "back": "Retour",
+    "next": "Suivant",
+    "confirm": "Confirmer",
+    "perNight": "par nuit",
+    "guests": "Voyageurs",
+    "checkIn": "Arrivée",
+    "checkOut": "Départ",
+    "destination": "Destination",
+    "nights": "nuits"
+  },
+  "home": {
+    "hero": "Découvrez les Trésors Cachés de l'Algérie",
+    "heroSub": "Réservez hôtels, vols et forfaits voyage aux meilleurs prix",
+    "searchPlaceholder": "Où allez-vous ?",
+    "popular": "Destinations Populaires",
+    "deals": "Meilleures Offres du Jour",
+    "whyUs": "Pourquoi Travel Shop Algérie ?",
+    "bestPrice": "Garantie du Meilleur Prix",
+    "support": "Support Client 24/7",
+    "secure": "Paiements Sécurisés",
+    "loyalty": "Gagnez des Points Fidélité"
+  },
+  "search": {
+    "results": "Résultats de Recherche",
+    "noResults": "Aucun hôtel trouvé. Essayez d'autres dates ou destination.",
+    "filters": "Filtres",
+    "priceRange": "Gamme de Prix",
+    "starRating": "Étoiles",
+    "amenities": "Équipements",
+    "sortBy": "Trier par",
+    "priceLow": "Prix: Croissant",
+    "priceHigh": "Prix: Décroissant",
+    "ratingHigh": "Note: Décroissante"
+  },
+  "booking": {
+    "bookNow": "Réserver",
+    "guestDetails": "Détails des Voyageurs",
+    "paymentDetails": "Détails de Paiement",
+    "reviewBooking": "Vérifier la Réservation",
+    "totalAmount": "Montant Total",
+    "promoCode": "Code Promo",
+    "apply": "Appliquer",
+    "loyaltyPoints": "Utiliser les Points Fidélité",
+    "confirmBooking": "Confirmer et Payer",
+    "bookingConfirmed": "Réservation Confirmée !",
+    "bookingRef": "Référence de Réservation"
+  },
+  "auth": {
+    "email": "Email",
+    "password": "Mot de passe",
+    "firstName": "Prénom",
+    "lastName": "Nom",
+    "phone": "Téléphone",
+    "loginTitle": "Bienvenue",
+    "registerTitle": "Créer un Compte",
+    "noAccount": "Pas encore de compte ?",
+    "hasAccount": "Déjà un compte ?"
+  }
+}

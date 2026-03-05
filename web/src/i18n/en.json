@@ -1,0 +1,73 @@
+{
+  "common": {
+    "appName": "Travel Shop Algeria",
+    "search": "Search",
+    "login": "Login",
+    "register": "Register",
+    "logout": "Logout",
+    "profile": "Profile",
+    "myBookings": "My Bookings",
+    "home": "Home",
+    "loading": "Loading...",
+    "error": "Something went wrong",
+    "save": "Save",
+    "cancel": "Cancel",
+    "back": "Back",
+    "next": "Next",
+    "confirm": "Confirm",
+    "perNight": "per night",
+    "guests": "Guests",
+    "checkIn": "Check-in",
+    "checkOut": "Check-out",
+    "destination": "Destination",
+    "nights": "nights"
+  },
+  "home": {
+    "hero": "Discover Algeria's Hidden Gems",
+    "heroSub": "Book hotels, flights, and travel packages at the best prices",
+    "searchPlaceholder": "Where are you going?",
+    "popular": "Popular Destinations",
+    "deals": "Today's Best Deals",
+    "whyUs": "Why Travel Shop Algeria?",
+    "bestPrice": "Best Price Guarantee",
+    "support": "24/7 Customer Support",
+    "secure": "Secure Payments",
+    "loyalty": "Earn Loyalty Points"
+  },
+  "search": {
+    "results": "Search Results",
+    "noResults": "No hotels found. Try different dates or destination.",
+    "filters": "Filters",
+    "priceRange": "Price Range",
+    "starRating": "Star Rating",
+    "amenities": "Amenities",
+    "sortBy": "Sort by",
+    "priceLow": "Price: Low to High",
+    "priceHigh": "Price: High to Low",
+    "ratingHigh": "Rating: High to Low"
+  },
+  "booking": {
+    "bookNow": "Book Now",
+    "guestDetails": "Guest Details",
+    "paymentDetails": "Payment Details",
+    "reviewBooking": "Review Booking",
+    "totalAmount": "Total Amount",
+    "promoCode": "Promo Code",
+    "apply": "Apply",
+    "loyaltyPoints": "Use Loyalty Points",
+    "confirmBooking": "Confirm & Pay",
+    "bookingConfirmed": "Booking Confirmed!",
+    "bookingRef": "Booking Reference"
+  },
+  "auth": {
+    "email": "Email",
+    "password": "Password",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "phone": "Phone",
+    "loginTitle": "Welcome Back",
+    "registerTitle": "Create Account",
+    "noAccount": "Don't have an account?",
+    "hasAccount": "Already have an account?"
+  }
+}
