@@ -25,7 +25,7 @@ export class LoyaltyController {
     @Query('page') page?: number,
     @Query('limit') limit?: number,
   ) {
-    return this.loyaltyService.getHistory(userId, page, limit);
+    return this.loyaltyService.getHistory(userId, page || 1, limit || 20);
   }
 
   @Post('redeem')

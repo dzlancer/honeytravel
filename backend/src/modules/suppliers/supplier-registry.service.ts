@@ -25,22 +25,33 @@ export class SupplierRegistryService implements OnModuleInit {
   }
 
   private async loadAdapters() {
-    const suppliers = await this.supplierRepo.find({ where: { isActive: true } });
-    for (const supplier of suppliers) {
-      try {
-        const factory = this.adapterFactories.get(supplier.code);
-        if (!factory) {
-          this.logger.warn(`No adapter factory for supplier: ${supplier.code}`);
-          continue;
+    // Always register the mock adapter for development/demo
+    const mockAdapter = new MockHotelAdapter();
+    mockAdapter.initialize({}, {});
+    this.adapters.set('mock-hotel', mockAdapter);
+    this.logger.log('Loaded built-in mock-hotel adapter');
+
+    // Load additional adapters from database
+    try {
+      const suppliers = await this.supplierRepo.find({ where: { isActive: true } });
+      for (const supplier of suppliers) {
+        try {
+          const factory = this.adapterFactories.get(supplier.code);
+          if (!factory) {
+            this.logger.warn(`No adapter factory for supplier: ${supplier.code}`);
+            continue;
+          }
+          const adapter = factory();
+          const credentials = JSON.parse(decrypt(supplier.encryptedCredentials));
+          adapter.initialize(credentials, supplier.config as Record<string, unknown> | undefined);
+          this.adapters.set(supplier.code, adapter);
+          this.logger.log(`Loaded adapter: ${supplier.code}`);
+        } catch (error) {
+          this.logger.error(`Failed to load adapter for ${supplier.code}: ${error}`);
         }
-        const adapter = factory();
-        const credentials = JSON.parse(decrypt(supplier.encryptedCredentials));
-        adapter.initialize(credentials, supplier.config as Record<string, unknown> | undefined);
-        this.adapters.set(supplier.code, adapter);
-        this.logger.log(`Loaded adapter: ${supplier.code}`);
-      } catch (error) {
-        this.logger.error(`Failed to load adapter for ${supplier.code}: ${error}`);
       }
+    } catch (error) {
+      this.logger.warn(`Could not load suppliers from database: ${error}`);
     }
   }
 

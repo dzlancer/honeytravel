@@ -36,13 +36,13 @@ export class AdminController {
   @Get('users')
   @ApiOperation({ summary: 'List all users' })
   async listUsers(@Query('page') page?: number, @Query('limit') limit?: number) {
-    return this.usersService.findAll(page, limit);
+    return this.usersService.findAll(page || 1, limit || 20);
   }
 
   @Get('bookings')
   @ApiOperation({ summary: 'List all bookings' })
   async listBookings(@Query('page') page?: number, @Query('limit') limit?: number) {
-    return this.bookingsService.findAll(page, limit);
+    return this.bookingsService.findAll(page || 1, limit || 20);
   }
 
   // Promo codes
@@ -64,7 +64,7 @@ export class AdminController {
   @Get('promos')
   @ApiOperation({ summary: 'List promo codes' })
   async listPromos(@Query('page') page?: number, @Query('limit') limit?: number) {
-    const [promos, total] = await this.marketingService.getPromoCodes(page, limit);
+    const [promos, total] = await this.marketingService.getPromoCodes(page || 1, limit || 20);
     return { promos, total };
   }
 
@@ -85,7 +85,7 @@ export class AdminController {
   @Get('campaigns')
   @ApiOperation({ summary: 'List campaigns' })
   async listCampaigns(@Query('page') page?: number, @Query('limit') limit?: number) {
-    const [campaigns, total] = await this.marketingService.getCampaigns(page, limit);
+    const [campaigns, total] = await this.marketingService.getCampaigns(page || 1, limit || 20);
     return { campaigns, total };
   }
 

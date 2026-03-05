@@ -20,9 +20,11 @@ export class BookingsService {
   ) {}
 
   async create(userId: string, dto: Partial<Booking>): Promise<Booking> {
+    const guestCount = (dto as any).guestCount || (dto.guestDetails?.length ?? 1);
     const booking = this.bookingRepo.create({
       ...dto,
       userId,
+      guestCount,
       status: BookingStatus.PENDING,
     });
 
@@ -98,14 +100,17 @@ export class BookingsService {
       }
     }
 
-    // Reverse loyalty points
-    if (booking.loyaltyPointsEarned > 0) {
-      await this.loyaltyService.deductPoints(
-        booking.userId,
-        booking.loyaltyPointsEarned,
-        bookingId,
-        `Points reversed for cancelled booking ${bookingId}`,
-      );
+    // Reverse loyalty points only if booking was confirmed and has earned points
+    if (booking.status === BookingStatus.CONFIRMED && booking.loyaltyPointsEarned > 0) {
+      const user = await this.loyaltyService.getBalance(booking.userId);
+      if (user >= booking.loyaltyPointsEarned) {
+        await this.loyaltyService.deductPoints(
+          booking.userId,
+          booking.loyaltyPointsEarned,
+          bookingId,
+          `Points reversed for cancelled booking ${bookingId}`,
+        );
+      }
     }
 
     booking.status = BookingStatus.CANCELLED;

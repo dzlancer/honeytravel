@@ -50,8 +50,8 @@ export class User {
   @Column({ default: false })
   isEmailVerified: boolean;
 
-  @Column({ nullable: true })
-  refreshToken: string;
+  @Column({ nullable: true, type: 'varchar' })
+  refreshToken: string | null;
 
   @Column({ nullable: true })
   passwordResetToken: string;

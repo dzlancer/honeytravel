@@ -21,7 +21,7 @@ class CreateBookingDto {
   @ApiProperty() @IsString() supplierId: string;
   @ApiProperty() @IsDateString() checkIn: string;
   @ApiProperty() @IsDateString() checkOut: string;
-  @ApiProperty() @IsNumber() @Min(1) guestCount: number;
+  @ApiProperty({ required: false }) @IsOptional() @IsNumber() @Min(1) guestCount?: number;
   @ApiProperty() @IsNumber() totalAmount: number;
   @ApiProperty({ default: 'USD' }) @IsOptional() @IsString() currency?: string;
   @ApiProperty({ type: [GuestDetailDto] }) @IsArray() @ValidateNested({ each: true }) @Type(() => GuestDetailDto) guestDetails: GuestDetailDto[];
@@ -49,7 +49,7 @@ export class BookingsController {
     @Query('page') page?: number,
     @Query('limit') limit?: number,
   ) {
-    return this.bookingsService.findByUserId(userId, page, limit);
+    return this.bookingsService.findByUserId(userId, page || 1, limit || 20);
   }
 
   @Get(':id')
