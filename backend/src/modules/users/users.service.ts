@@ -24,7 +24,7 @@ export class UsersService {
   }
 
   async updateRefreshToken(id: string, refreshToken: string | null): Promise<void> {
-    await this.usersRepo.update(id, { refreshToken });
+    await this.usersRepo.update(id, { refreshToken: refreshToken ?? undefined });
   }
 
   async updateProfile(id: string, data: Partial<User>): Promise<User> {

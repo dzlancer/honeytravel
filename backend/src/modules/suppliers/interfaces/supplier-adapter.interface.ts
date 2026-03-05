@@ -1,7 +1,7 @@
 import {
   SearchCriteria, AvailabilityRequest, AvailabilityResponse,
   SupplierBookingRequest, SupplierBookingResponse, Hotel,
-} from '../../../../shared/types/supplier';
+} from '../../../../../shared/types/supplier';
 
 export abstract class SupplierAdapter {
   abstract readonly supplierId: string;

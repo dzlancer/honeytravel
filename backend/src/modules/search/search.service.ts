@@ -134,7 +134,7 @@ export class SearchService implements OnModuleInit {
       });
     }
 
-    const sort: Record<string, unknown>[] = [];
+    const sort: any[] = [];
     if (sortBy === 'price') sort.push({ minPrice: 'asc' });
     else if (sortBy === 'rating') sort.push({ avgRating: 'desc' });
     else if (sortBy === 'distance' && lat && lng) {

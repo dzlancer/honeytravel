@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Hotel } from './entities/hotel.entity';
 import { SupplierRegistryService } from './supplier-registry.service';
-import { SearchCriteria } from '../../../shared/types/supplier';
+import { SearchCriteria } from '../../../../shared/types/supplier';
 
 @Injectable()
 export class SuppliersService {

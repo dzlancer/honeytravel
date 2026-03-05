@@ -3,7 +3,7 @@ import { SupplierAdapter } from '../interfaces/supplier-adapter.interface';
 import {
   SearchCriteria, AvailabilityRequest, AvailabilityResponse,
   SupplierBookingRequest, SupplierBookingResponse, Hotel,
-} from '../../../../shared/types/supplier';
+} from '../../../../../shared/types/supplier';
 import { v4 as uuid } from 'uuid';
 
 @Injectable()

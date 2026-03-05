@@ -53,7 +53,12 @@ export class AdminController {
     maxUses: number; validFrom: string; validUntil: string;
     minBookingAmount?: number; currency?: string;
   }) {
-    return this.marketingService.createPromoCode(body);
+    const { validFrom, validUntil, ...rest } = body;
+    return this.marketingService.createPromoCode({
+      ...rest,
+      validFrom: new Date(validFrom),
+      validUntil: new Date(validUntil),
+    });
   }
 
   @Get('promos')
@@ -70,7 +75,11 @@ export class AdminController {
     name: string; subject: string; body: string;
     targetAudience: string; scheduledAt?: string;
   }) {
-    return this.marketingService.createCampaign(body);
+    const { scheduledAt, ...rest } = body;
+    return this.marketingService.createCampaign({
+      ...rest,
+      ...(scheduledAt ? { scheduledAt: new Date(scheduledAt) } : {}),
+    });
   }
 
   @Get('campaigns')
