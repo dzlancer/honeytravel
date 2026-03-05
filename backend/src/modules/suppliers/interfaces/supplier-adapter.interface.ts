@@ -8,6 +8,11 @@ export abstract class SupplierAdapter {
 
   abstract searchHotels(criteria: SearchCriteria): Promise<Hotel[]>;
 
+  /** Get a single hotel by ID. Returns null if not found by this adapter. */
+  async getHotelById(_id: string): Promise<Hotel | null> {
+    return null;
+  }
+
   abstract checkAvailability(request: AvailabilityRequest): Promise<AvailabilityResponse>;
 
   abstract createBooking(details: SupplierBookingRequest): Promise<SupplierBookingResponse>;

@@ -17,6 +17,12 @@ export class MockHotelAdapter extends SupplierAdapter {
     this.logger.log(`MockHotelAdapter initialized for supplier: ${this.supplierId}`);
   }
 
+  // Stable IDs for mock hotels so detail pages work after search
+  private static readonly HOTEL_IDS = {
+    MH001: 'a1b2c3d4-e5f6-7890-abcd-ef1234567001',
+    MH002: 'a1b2c3d4-e5f6-7890-abcd-ef1234567002',
+  };
+
   async searchHotels(criteria: SearchCriteria): Promise<Hotel[]> {
     this.logger.log(`Searching hotels: ${JSON.stringify(criteria)}`);
 
@@ -24,7 +30,7 @@ export class MockHotelAdapter extends SupplierAdapter {
     // Here we return mock data that matches the criteria.
     const mockHotels: Hotel[] = [
       {
-        id: uuid(),
+        id: MockHotelAdapter.HOTEL_IDS.MH001,
         supplierId: this.supplierId,
         supplierHotelId: 'MH001',
         name: 'Grand Hotel Algiers',
@@ -45,7 +51,7 @@ export class MockHotelAdapter extends SupplierAdapter {
         avgRating: 4.7, reviewCount: 342, minPrice: 250, currency: 'USD',
       },
       {
-        id: uuid(),
+        id: MockHotelAdapter.HOTEL_IDS.MH002,
         supplierId: this.supplierId,
         supplierHotelId: 'MH002',
         name: 'Sahara Oasis Resort',
@@ -77,6 +83,11 @@ export class MockHotelAdapter extends SupplierAdapter {
       }
       return true;
     });
+  }
+
+  async getHotelById(id: string): Promise<Hotel | null> {
+    const allHotels = await this.searchHotels({ destination: '', checkIn: '', checkOut: '', guests: 2 });
+    return allHotels.find((h) => h.id === id) || null;
   }
 
   async checkAvailability(request: AvailabilityRequest): Promise<AvailabilityResponse> {

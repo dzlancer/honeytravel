@@ -1,4 +1,9 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+// Use relative URLs in the browser (goes through Next.js rewrite proxy, avoids CORS)
+// Use absolute URL only on the server side (SSR)
+const API_URL =
+  typeof window !== 'undefined'
+    ? ''
+    : process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
 class ApiClient {
   private accessToken: string | null = null;

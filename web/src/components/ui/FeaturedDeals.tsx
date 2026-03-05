@@ -3,9 +3,10 @@
 import Image from 'next/image';
 import Link from 'next/link';
 
+// Use stable UUIDs that match mock adapter hotel IDs
 const DEALS = [
   {
-    id: 'MH001',
+    id: 'a1b2c3d4-e5f6-7890-abcd-ef1234567001',
     name: 'Grand Hotel Algiers',
     city: 'Algiers',
     image: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=600',
@@ -14,7 +15,7 @@ const DEALS = [
     stars: 5,
   },
   {
-    id: 'MH002',
+    id: 'a1b2c3d4-e5f6-7890-abcd-ef1234567002',
     name: 'Sahara Oasis Resort',
     city: 'Ghardaia',
     image: 'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=600',
@@ -23,7 +24,7 @@ const DEALS = [
     stars: 4,
   },
   {
-    id: 'MH003',
+    id: 'a1b2c3d4-e5f6-7890-abcd-ef1234567003',
     name: 'Constantine Cliff Hotel',
     city: 'Constantine',
     image: 'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=600',

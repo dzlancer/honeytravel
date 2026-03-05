@@ -35,12 +35,34 @@ export class PaymentsService {
       throw new BadRequestException('Not your booking');
     }
 
+    const stripeKey = this.configService.get('STRIPE_SECRET_KEY', 'sk_test_placeholder');
+    // Detect placeholder / non-real Stripe keys → fall back to mock mode
+    const isPlaceholder =
+      !stripeKey ||
+      stripeKey.includes('placeholder') ||
+      stripeKey.includes('your_key') ||
+      stripeKey.includes('your_') ||
+      stripeKey.length < 20;            // real Stripe keys are 30+ chars
+    const isMockMode = isPlaceholder;
+
     try {
-      const paymentIntent = await this.stripe.paymentIntents.create({
-        amount: Math.round(amount * 100), // Stripe uses cents
-        currency: currency.toLowerCase(),
-        metadata: { bookingId, userId },
-      });
+      let intentId: string;
+      let clientSecret: string;
+
+      if (isMockMode) {
+        // Mock mode for development — simulate a successful payment
+        intentId = `pi_mock_${Date.now()}`;
+        clientSecret = `${intentId}_secret_mock`;
+        this.logger.warn('Using mock payment mode — no real Stripe charges');
+      } else {
+        const paymentIntent = await this.stripe.paymentIntents.create({
+          amount: Math.round(amount * 100), // Stripe uses cents
+          currency: currency.toLowerCase(),
+          metadata: { bookingId, userId },
+        });
+        intentId = paymentIntent.id;
+        clientSecret = paymentIntent.client_secret!;
+      }
 
       const payment = this.paymentRepo.create({
         bookingId,
@@ -49,17 +71,29 @@ export class PaymentsService {
         currency,
         status: PaymentStatus.PENDING,
         method: PaymentMethod.CARD,
-        stripePaymentIntentId: paymentIntent.id,
+        stripePaymentIntentId: intentId,
       });
-      await this.paymentRepo.save(payment);
+      const saved = await this.paymentRepo.save(payment);
+
+      // In mock mode, auto-confirm the booking
+      if (isMockMode) {
+        saved.status = PaymentStatus.SUCCEEDED;
+        await this.paymentRepo.save(saved);
+        try {
+          await this.bookingsService.confirm(bookingId);
+        } catch (confirmError) {
+          this.logger.warn(`Mock confirm failed (non-blocking): ${confirmError}`);
+        }
+      }
 
       return {
-        clientSecret: paymentIntent.client_secret,
-        paymentIntentId: paymentIntent.id,
-        paymentId: payment.id,
+        clientSecret,
+        paymentIntentId: intentId,
+        paymentId: saved.id,
       };
     } catch (error) {
-      this.logger.error(`Failed to create payment intent: ${error}`);
+      this.logger.error(`Failed to create payment intent: ${error?.message || error}`);
+      if (error?.stack) this.logger.error(error.stack);
       throw new BadRequestException('Payment initialization failed');
     }
   }

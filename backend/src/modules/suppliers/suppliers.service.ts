@@ -58,9 +58,18 @@ export class SuppliersService {
   }
 
   async getHotelById(id: string) {
+    // First check database
     const hotel = await this.hotelRepo.findOne({ where: { id } });
-    if (!hotel) throw new NotFoundException('Hotel not found');
-    return hotel;
+    if (hotel) return hotel;
+
+    // Then check all supplier adapters (for mock/external hotels not in DB)
+    const adapters = this.registry.getAllAdapters();
+    for (const adapter of adapters) {
+      const adapterHotel = await adapter.getHotelById(id);
+      if (adapterHotel) return adapterHotel;
+    }
+
+    throw new NotFoundException('Hotel not found');
   }
 
   async checkAvailability(supplierId: string, hotelId: string, checkIn: string, checkOut: string, occupancy: { adults: number; children: number }) {

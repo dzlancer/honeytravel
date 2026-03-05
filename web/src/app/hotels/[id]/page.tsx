@@ -85,7 +85,7 @@ export default function HotelDetailPage() {
           ))}
         </div>
         <h1 className="text-3xl font-bold text-gray-900">{hotel.name}</h1>
-        <p className="text-gray-600">{hotel.street}, {hotel.city}, {hotel.country}</p>
+        <p className="text-gray-600">{hotel.address?.street}, {hotel.address?.city}, {hotel.address?.country}</p>
       </div>
 
       {/* Images */}
