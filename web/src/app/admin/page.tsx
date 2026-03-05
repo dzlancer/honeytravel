@@ -11,8 +11,11 @@ export default function AdminDashboard() {
   const router = useRouter();
   const [stats, setStats] = useState<any>(null);
   const [activeTab, setActiveTab] = useState<'dashboard' | 'promos' | 'campaigns'>('dashboard');
-  const [promoForm, setPromoForm] = useState({
-    code: '', discountType: 'percentage' as const, discountValue: 10,
+  const [promoForm, setPromoForm] = useState<{
+    code: string; discountType: 'percentage' | 'fixed'; discountValue: number;
+    maxUses: number; validFrom: string; validUntil: string;
+  }>({
+    code: '', discountType: 'percentage', discountValue: 10,
     maxUses: 100, validFrom: '', validUntil: '',
   });
 

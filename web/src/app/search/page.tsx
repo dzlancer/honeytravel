@@ -1,13 +1,13 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import { api } from '@/lib/api';
 import { formatCurrency } from '@/lib/currency';
 
-export default function SearchPage() {
+function SearchContent() {
   const searchParams = useSearchParams();
   const [results, setResults] = useState<any>({ items: [], total: 0 });
   const [loading, setLoading] = useState(true);
@@ -203,5 +203,17 @@ export default function SearchPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function SearchPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex justify-center py-20">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600" />
+      </div>
+    }>
+      <SearchContent />
+    </Suspense>
   );
 }
