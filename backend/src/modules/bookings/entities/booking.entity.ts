@@ -17,6 +17,7 @@ export enum BookingStatus {
 export enum ProductType {
   HOTEL = 'hotel',
   FLIGHT = 'flight',
+  ACTIVITY = 'activity',
   PACKAGE = 'package',
   CAR_RENTAL = 'car_rental',
 }

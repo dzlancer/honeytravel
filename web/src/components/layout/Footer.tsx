@@ -6,9 +6,9 @@ import { Logo } from '@/components/ui/Logo';
 
 const EXPLORE_LINKS = [
   { key: 'hotels', href: '/search' },
-  { key: 'flights', href: '/search?type=flight' },
-  { key: 'packages', href: '/search?type=package' },
-  { key: 'carRentals', href: '/search?type=car' },
+  { key: 'flights', href: '/search?type=flights' },
+  { key: 'activities', href: '/search?type=activities' },
+  { key: 'carRentals', href: '/search?type=cars' },
 ];
 
 const COMPANY_LINKS = [

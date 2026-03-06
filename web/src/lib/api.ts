@@ -162,6 +162,36 @@ class ApiClient {
   getRecommendations() {
     return this.request<any>('/marketing/recommendations');
   }
+
+  // Flights
+  searchFlights(params: Record<string, string>) {
+    const qs = new URLSearchParams(params).toString();
+    return this.request<any>(`/suppliers/flights/search?${qs}`);
+  }
+
+  getFlight(id: string) {
+    return this.request<any>(`/suppliers/flights/${id}`);
+  }
+
+  // Activities
+  searchActivities(params: Record<string, string>) {
+    const qs = new URLSearchParams(params).toString();
+    return this.request<any>(`/suppliers/activities/search?${qs}`);
+  }
+
+  getActivity(id: string) {
+    return this.request<any>(`/suppliers/activities/${id}`);
+  }
+
+  // Cars
+  searchCars(params: Record<string, string>) {
+    const qs = new URLSearchParams(params).toString();
+    return this.request<any>(`/suppliers/cars/search?${qs}`);
+  }
+
+  getCar(id: string) {
+    return this.request<any>(`/suppliers/cars/${id}`);
+  }
 }
 
 export const api = new ApiClient();

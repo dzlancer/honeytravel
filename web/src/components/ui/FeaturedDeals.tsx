@@ -3,39 +3,55 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useTranslation } from 'react-i18next';
+import { Hotel, Compass, Car, MapPin, Star } from 'lucide-react';
 
 const DEALS = [
   {
     id: 'a1b2c3d4-e5f6-7890-abcd-ef1234567001',
+    type: 'hotel' as const,
     name: 'Grand Hotel Algiers',
-    city: 'Algiers',
+    subtitle: 'Algiers, Algeria',
     image: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=600',
     price: 250,
+    priceLabel: 'night',
     rating: 4.7,
-    stars: 5,
     badge: 'Popular',
+    href: '/hotels/a1b2c3d4-e5f6-7890-abcd-ef1234567001',
+    icon: Hotel,
   },
   {
-    id: 'a1b2c3d4-e5f6-7890-abcd-ef1234567002',
-    name: 'Sahara Oasis Resort',
-    city: 'Ghardaia',
-    image: 'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=600',
-    price: 120,
-    rating: 4.3,
-    stars: 4,
-    badge: 'Best Value',
+    id: 'a1c2t3v4-d5e6-7890-abcd-activity00001',
+    type: 'activity' as const,
+    name: 'Sahara Camel Trek',
+    subtitle: 'Ghardaia — 4 hours',
+    image: 'https://images.unsplash.com/photo-1549221987-25a490f65d34?w=600',
+    price: 45,
+    priceLabel: 'person',
+    rating: 4.8,
+    badge: 'New',
+    href: '/activities/a1c2t3v4-d5e6-7890-abcd-activity00001',
+    icon: Compass,
   },
   {
-    id: 'a1b2c3d4-e5f6-7890-abcd-ef1234567003',
-    name: 'Constantine Cliff Hotel',
-    city: 'Constantine',
-    image: 'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=600',
-    price: 150,
+    id: 'c1a2r3s4-d5e6-7890-abcd-carrental0002',
+    type: 'car' as const,
+    name: 'Peugeot 3008 SUV',
+    subtitle: 'Algiers — Automatic',
+    image: 'https://images.unsplash.com/photo-1519641471654-76ce0107ad1b?w=600',
+    price: 65,
+    priceLabel: 'day',
     rating: 4.5,
-    stars: 4,
-    badge: null,
+    badge: 'Best Value',
+    href: '/cars/c1a2r3s4-d5e6-7890-abcd-carrental0002',
+    icon: Car,
   },
 ];
+
+const TYPE_COLORS = {
+  hotel: 'bg-primary-100 text-primary-700',
+  activity: 'bg-accent-100 text-accent-700',
+  car: 'bg-terracotta-100 text-terracotta-700',
+};
 
 export function FeaturedDeals() {
   const { t } = useTranslation();
@@ -59,7 +75,7 @@ export function FeaturedDeals() {
         {DEALS.map((deal, i) => (
           <Link
             key={deal.id}
-            href={`/hotels/${deal.id}`}
+            href={deal.href}
             className="card-interactive group animate-fade-in-up"
             style={{ animationDelay: `${i * 0.1}s` }}
           >
@@ -80,35 +96,30 @@ export function FeaturedDeals() {
                   </span>
                 </div>
               )}
+              {/* Type indicator */}
+              <div className="absolute top-3 right-3 rtl:right-auto rtl:left-3">
+                <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold backdrop-blur-sm ${TYPE_COLORS[deal.type]}`}>
+                  <deal.icon className="w-3 h-3" />
+                  {t(`common.${deal.type === 'hotel' ? 'hotels' : deal.type === 'activity' ? 'activities' : 'carRentals'}`)}
+                </span>
+              </div>
               {/* Rating */}
               <div className="absolute bottom-3 left-3 rtl:left-auto rtl:right-3">
                 <span className="inline-flex items-center gap-1 bg-white/90 backdrop-blur-sm
                   text-primary-800 px-2.5 py-1 rounded-lg text-sm font-semibold">
-                  <svg className="w-3.5 h-3.5 text-accent-500 fill-current" viewBox="0 0 20 20">
-                    <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z" />
-                  </svg>
+                  <Star className="w-3.5 h-3.5 text-accent-500 fill-accent-500" />
                   {deal.rating}
                 </span>
               </div>
             </div>
 
             <div className="p-5">
-              <div className="flex items-center gap-1 mb-1.5">
-                {Array.from({ length: deal.stars }).map((_, i) => (
-                  <svg key={i} className="w-3.5 h-3.5 text-accent-500 fill-current" viewBox="0 0 20 20">
-                    <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z" />
-                  </svg>
-                ))}
-              </div>
               <h3 className="text-heading-md text-gray-900 group-hover:text-primary-600 transition-colors">
                 {deal.name}
               </h3>
               <p className="text-gray-500 text-sm flex items-center gap-1 mt-1">
-                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                </svg>
-                {deal.city}, Algeria
+                <MapPin className="w-3.5 h-3.5" />
+                {deal.subtitle}
               </p>
 
               <div className="flex items-end justify-between mt-4 pt-4 border-t border-gray-100">
@@ -116,11 +127,11 @@ export function FeaturedDeals() {
                   <span className="text-xs text-gray-400 uppercase tracking-wide">{t('common.from')}</span>
                   <div className="flex items-baseline gap-1">
                     <span className="text-2xl font-bold text-primary-700">${deal.price}</span>
-                    <span className="text-sm text-gray-400">/ {t('common.night')}</span>
+                    <span className="text-sm text-gray-400">/ {deal.priceLabel}</span>
                   </div>
                 </div>
                 <span className="btn-primary btn-sm text-xs group-hover:shadow-glow-primary">
-                  {t('hotel.bookNow')}
+                  {t('common.viewAll').split(' ')[0]}
                 </span>
               </div>
             </div>

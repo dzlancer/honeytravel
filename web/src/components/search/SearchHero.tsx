@@ -3,36 +3,267 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
+import { Plane, Compass, Car, Hotel, Search } from 'lucide-react';
 import clsx from 'clsx';
 
-const TABS = ['hotels', 'flights', 'packages', 'carRentals'] as const;
+const TABS = ['hotels', 'flights', 'activities', 'carRentals'] as const;
 
-const TAB_ICONS: Record<string, string> = {
-  hotels: 'M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4',
-  flights: 'M12 19l-7-7 1.41-1.41L11 15.17V2h2v13.17l4.59-4.58L19 12l-7 7z',
-  packages: 'M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4',
-  carRentals: 'M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z',
+const TAB_ICONS: Record<string, React.ElementType> = {
+  hotels: Hotel,
+  flights: Plane,
+  activities: Compass,
+  carRentals: Car,
 };
 
 export function SearchHero() {
   const router = useRouter();
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<typeof TABS[number]>('hotels');
+
+  // Hotel fields
   const [destination, setDestination] = useState('');
   const [checkIn, setCheckIn] = useState('');
   const [checkOut, setCheckOut] = useState('');
   const [guests, setGuests] = useState(2);
 
+  // Flight fields
+  const [origin, setOrigin] = useState('');
+  const [departureDate, setDepartureDate] = useState('');
+  const [returnDate, setReturnDate] = useState('');
+  const [passengers, setPassengers] = useState(1);
+  const [cabinClass, setCabinClass] = useState('economy');
+
+  // Activity fields
+  const [groupSize, setGroupSize] = useState(2);
+
+  // Car fields
+  const [pickupLocation, setPickupLocation] = useState('');
+  const [pickupDate, setPickupDate] = useState('');
+  const [dropoffDate, setDropoffDate] = useState('');
+
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     const params = new URLSearchParams();
-    if (destination) params.set('destination', destination);
-    if (checkIn) params.set('checkIn', checkIn);
-    if (checkOut) params.set('checkOut', checkOut);
-    params.set('guests', String(guests));
-    if (activeTab !== 'hotels') params.set('type', activeTab);
+
+    if (activeTab === 'hotels') {
+      if (destination) params.set('destination', destination);
+      if (checkIn) params.set('checkIn', checkIn);
+      if (checkOut) params.set('checkOut', checkOut);
+      params.set('guests', String(guests));
+    } else if (activeTab === 'flights') {
+      if (origin) params.set('origin', origin);
+      if (destination) params.set('destination', destination);
+      if (departureDate) params.set('departureDate', departureDate);
+      if (returnDate) params.set('returnDate', returnDate);
+      params.set('passengers', String(passengers));
+      params.set('cabinClass', cabinClass);
+      params.set('type', 'flights');
+    } else if (activeTab === 'activities') {
+      if (destination) params.set('destination', destination);
+      if (checkIn) params.set('date', checkIn);
+      params.set('groupSize', String(groupSize));
+      params.set('type', 'activities');
+    } else if (activeTab === 'carRentals') {
+      if (destination) params.set('pickupLocation', destination);
+      if (pickupDate) params.set('pickupDate', pickupDate);
+      if (dropoffDate) params.set('dropoffDate', dropoffDate);
+      params.set('type', 'cars');
+    }
+
     router.push(`/search?${params.toString()}`);
   };
+
+  const renderHotelFields = () => (
+    <div className="grid grid-cols-1 md:grid-cols-4 gap-3 md:gap-4">
+      <div className="md:col-span-1">
+        <label className="input-label">{t('common.destination')}</label>
+        <input
+          type="text"
+          value={destination}
+          onChange={(e) => setDestination(e.target.value)}
+          placeholder={t('home.searchPlaceholder')}
+          className="input-field text-gray-900"
+        />
+      </div>
+      <div>
+        <label className="input-label">{t('common.checkIn')}</label>
+        <input
+          type="date"
+          value={checkIn}
+          onChange={(e) => setCheckIn(e.target.value)}
+          className="input-field text-gray-900"
+        />
+      </div>
+      <div>
+        <label className="input-label">{t('common.checkOut')}</label>
+        <input
+          type="date"
+          value={checkOut}
+          onChange={(e) => setCheckOut(e.target.value)}
+          className="input-field text-gray-900"
+        />
+      </div>
+      <div>
+        <label className="input-label">{t('common.guests')}</label>
+        <div className="flex gap-2">
+          <select
+            value={guests}
+            onChange={(e) => setGuests(Number(e.target.value))}
+            className="input-field text-gray-900 flex-1"
+          >
+            {[1, 2, 3, 4, 5, 6].map((n) => (
+              <option key={n} value={n}>{n} {t(n > 1 ? 'common.guests' : 'common.guest')}</option>
+            ))}
+          </select>
+          <button type="submit" className="btn-primary whitespace-nowrap px-6">
+            <Search className="w-5 h-5" />
+            <span className="hidden md:inline">{t('common.search')}</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderFlightFields = () => (
+    <div className="grid grid-cols-1 md:grid-cols-4 gap-3 md:gap-4">
+      <div>
+        <label className="input-label">{t('flight.origin')}</label>
+        <input
+          type="text"
+          value={origin}
+          onChange={(e) => setOrigin(e.target.value)}
+          placeholder={t('flight.from')}
+          className="input-field text-gray-900"
+        />
+      </div>
+      <div>
+        <label className="input-label">{t('common.destination')}</label>
+        <input
+          type="text"
+          value={destination}
+          onChange={(e) => setDestination(e.target.value)}
+          placeholder={t('flight.to')}
+          className="input-field text-gray-900"
+        />
+      </div>
+      <div>
+        <label className="input-label">{t('flight.departureDate')}</label>
+        <input
+          type="date"
+          value={departureDate}
+          onChange={(e) => setDepartureDate(e.target.value)}
+          className="input-field text-gray-900"
+        />
+      </div>
+      <div>
+        <label className="input-label">{t('flight.passengers')}</label>
+        <div className="flex gap-2">
+          <select
+            value={passengers}
+            onChange={(e) => setPassengers(Number(e.target.value))}
+            className="input-field text-gray-900 flex-1"
+          >
+            {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((n) => (
+              <option key={n} value={n}>{n} {t(n > 1 ? 'flight.passengers' : 'flight.passenger')}</option>
+            ))}
+          </select>
+          <select
+            value={cabinClass}
+            onChange={(e) => setCabinClass(e.target.value)}
+            className="input-field text-gray-900 flex-1"
+          >
+            <option value="economy">{t('flight.economy')}</option>
+            <option value="business">{t('flight.business')}</option>
+            <option value="first">{t('flight.first')}</option>
+          </select>
+          <button type="submit" className="btn-primary whitespace-nowrap px-6">
+            <Search className="w-5 h-5" />
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderActivityFields = () => (
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4">
+      <div>
+        <label className="input-label">{t('common.destination')}</label>
+        <input
+          type="text"
+          value={destination}
+          onChange={(e) => setDestination(e.target.value)}
+          placeholder={t('home.searchPlaceholder')}
+          className="input-field text-gray-900"
+        />
+      </div>
+      <div>
+        <label className="input-label">{t('flight.departure')}</label>
+        <input
+          type="date"
+          value={checkIn}
+          onChange={(e) => setCheckIn(e.target.value)}
+          className="input-field text-gray-900"
+        />
+      </div>
+      <div>
+        <label className="input-label">{t('activity.groupSize')}</label>
+        <div className="flex gap-2">
+          <select
+            value={groupSize}
+            onChange={(e) => setGroupSize(Number(e.target.value))}
+            className="input-field text-gray-900 flex-1"
+          >
+            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => (
+              <option key={n} value={n}>{n} {t(n > 1 ? 'common.guests' : 'common.guest')}</option>
+            ))}
+          </select>
+          <button type="submit" className="btn-primary whitespace-nowrap px-6">
+            <Search className="w-5 h-5" />
+            <span className="hidden md:inline">{t('common.search')}</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderCarFields = () => (
+    <div className="grid grid-cols-1 md:grid-cols-4 gap-3 md:gap-4">
+      <div>
+        <label className="input-label">{t('car.pickupLocation')}</label>
+        <input
+          type="text"
+          value={destination}
+          onChange={(e) => setDestination(e.target.value)}
+          placeholder={t('car.pickupLocation')}
+          className="input-field text-gray-900"
+        />
+      </div>
+      <div>
+        <label className="input-label">{t('car.pickupDate')}</label>
+        <input
+          type="date"
+          value={pickupDate}
+          onChange={(e) => setPickupDate(e.target.value)}
+          className="input-field text-gray-900"
+        />
+      </div>
+      <div>
+        <label className="input-label">{t('car.dropoffDate')}</label>
+        <input
+          type="date"
+          value={dropoffDate}
+          onChange={(e) => setDropoffDate(e.target.value)}
+          className="input-field text-gray-900"
+        />
+      </div>
+      <div className="flex items-end">
+        <button type="submit" className="btn-primary w-full whitespace-nowrap px-6">
+          <Search className="w-5 h-5" />
+          <span>{t('common.search')}</span>
+        </button>
+      </div>
+    </div>
+  );
 
   return (
     <section className="relative overflow-hidden">
@@ -59,84 +290,32 @@ export function SearchHero() {
           <div className="bg-white rounded-2xl shadow-soft-xl overflow-hidden">
             {/* Tabs */}
             <div className="flex border-b border-gray-100 px-2 pt-2">
-              {TABS.map((tab) => (
-                <button
-                  key={tab}
-                  onClick={() => setActiveTab(tab)}
-                  className={clsx(
-                    'flex items-center gap-2 px-5 py-3 text-sm font-medium rounded-t-xl transition-colors',
-                    activeTab === tab
-                      ? 'bg-primary-50 text-primary-700 border-b-2 border-primary-600'
-                      : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
-                  )}
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={TAB_ICONS[tab]} />
-                  </svg>
-                  <span className="hidden sm:inline">{t(`common.${tab}`)}</span>
-                </button>
-              ))}
+              {TABS.map((tab) => {
+                const Icon = TAB_ICONS[tab];
+                return (
+                  <button
+                    key={tab}
+                    onClick={() => setActiveTab(tab)}
+                    className={clsx(
+                      'flex items-center gap-2 px-5 py-3 text-sm font-medium rounded-t-xl transition-colors',
+                      activeTab === tab
+                        ? 'bg-primary-50 text-primary-700 border-b-2 border-primary-600'
+                        : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+                    )}
+                  >
+                    <Icon className="w-4 h-4" />
+                    <span className="hidden sm:inline">{t(`common.${tab}`)}</span>
+                  </button>
+                );
+              })}
             </div>
 
             {/* Search Form */}
             <form onSubmit={handleSearch} className="p-4 md:p-6">
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-3 md:gap-4">
-                <div className="md:col-span-1">
-                  <label className="input-label">{t('common.destination')}</label>
-                  <div className="relative">
-                    <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                    </svg>
-                    <input
-                      type="text"
-                      value={destination}
-                      onChange={(e) => setDestination(e.target.value)}
-                      placeholder={t('home.searchPlaceholder')}
-                      className="input-field pl-10 text-gray-900"
-                    />
-                  </div>
-                </div>
-                <div>
-                  <label className="input-label">{t('common.checkIn')}</label>
-                  <input
-                    type="date"
-                    value={checkIn}
-                    onChange={(e) => setCheckIn(e.target.value)}
-                    className="input-field text-gray-900"
-                  />
-                </div>
-                <div>
-                  <label className="input-label">{t('common.checkOut')}</label>
-                  <input
-                    type="date"
-                    value={checkOut}
-                    onChange={(e) => setCheckOut(e.target.value)}
-                    className="input-field text-gray-900"
-                  />
-                </div>
-                <div>
-                  <label className="input-label">{t('common.guests')}</label>
-                  <div className="flex gap-2">
-                    <select
-                      value={guests}
-                      onChange={(e) => setGuests(Number(e.target.value))}
-                      className="input-field text-gray-900 flex-1"
-                    >
-                      {[1, 2, 3, 4, 5, 6].map((n) => (
-                        <option key={n} value={n}>{n} {t(n > 1 ? 'common.guests' : 'common.guest')}</option>
-                      ))}
-                    </select>
-                    <button type="submit" className="btn-primary whitespace-nowrap px-6">
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                          d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                      </svg>
-                      <span className="hidden md:inline">{t('common.search')}</span>
-                    </button>
-                  </div>
-                </div>
-              </div>
+              {activeTab === 'hotels' && renderHotelFields()}
+              {activeTab === 'flights' && renderFlightFields()}
+              {activeTab === 'activities' && renderActivityFields()}
+              {activeTab === 'carRentals' && renderCarFields()}
             </form>
           </div>
         </div>

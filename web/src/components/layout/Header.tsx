@@ -10,9 +10,9 @@ import clsx from 'clsx';
 
 const NAV_LINKS = [
   { key: 'hotels', href: '/search' },
-  { key: 'flights', href: '/search?type=flight' },
-  { key: 'packages', href: '/search?type=package' },
-  { key: 'carRentals', href: '/search?type=car' },
+  { key: 'flights', href: '/search?type=flights' },
+  { key: 'activities', href: '/search?type=activities' },
+  { key: 'carRentals', href: '/search?type=cars' },
 ] as const;
 
 export function Header() {
