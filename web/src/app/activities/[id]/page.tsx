@@ -140,7 +140,7 @@ export default function ActivityDetailPage() {
             <h1 className="text-display-sm font-bold text-gray-900">{activity.name}</h1>
             <div className="flex items-center gap-1.5 text-gray-500 mt-1">
               <MapPin className="w-4 h-4" />
-              <span>{activity.destination || activity.city}</span>
+              <span>{typeof activity.destination === 'object' ? activity.destination?.city : activity.destination || activity.city}</span>
             </div>
             <div className="flex flex-wrap gap-2 mt-3">
               {activity.difficulty && (

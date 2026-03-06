@@ -441,7 +441,16 @@ function SearchContent() {
     </motion.div>
   );
 
-  const renderFlightCard = (flight: any) => (
+  const renderFlightCard = (flight: any) => {
+    const seg = flight.segments?.[0];
+    const depTime = seg?.departure?.dateTime ? new Date(seg.departure.dateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '--:--';
+    const arrTime = seg?.arrival?.dateTime ? new Date(seg.arrival.dateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '--:--';
+    const depCity = seg?.departure?.airport?.city || '';
+    const arrCity = seg?.arrival?.airport?.city || '';
+    const airline = seg?.airline || '';
+    const flightNum = seg?.flightNumber || '';
+    const cabin = seg?.cabinClass || '';
+    return (
     <motion.div key={flight.id} variants={staggerItem}>
       <Link href={`/flights/${flight.id}`} className="card-hover flex flex-col sm:flex-row group">
         <div className="p-4 sm:p-5 flex-1">
@@ -450,19 +459,19 @@ function SearchContent() {
               <Plane className="w-4 h-4 text-primary-600" />
             </div>
             <div>
-              <span className="font-semibold text-gray-900">{flight.airline}</span>
-              {flight.flightNumber && (
-                <span className="text-gray-400 text-xs ms-2">{flight.flightNumber}</span>
+              <span className="font-semibold text-gray-900">{airline}</span>
+              {flightNum && (
+                <span className="text-gray-400 text-xs ms-2">{flightNum}</span>
               )}
             </div>
           </div>
           <div className="flex items-center gap-4 mb-3">
             <div className="text-center">
-              <p className="text-lg font-bold text-gray-900">{flight.departureTime || '--:--'}</p>
-              <p className="text-xs text-gray-500">{flight.departureCity || flight.origin}</p>
+              <p className="text-lg font-bold text-gray-900">{depTime}</p>
+              <p className="text-xs text-gray-500">{depCity}</p>
             </div>
             <div className="flex-1 flex flex-col items-center">
-              <span className="text-xs text-gray-400 mb-1">{flight.duration}</span>
+              <span className="text-xs text-gray-400 mb-1">{flight.totalDuration}</span>
               <div className="w-full h-px bg-gray-300 relative">
                 <Plane className="w-3 h-3 text-primary-500 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
               </div>
@@ -476,13 +485,13 @@ function SearchContent() {
               )}
             </div>
             <div className="text-center">
-              <p className="text-lg font-bold text-gray-900">{flight.arrivalTime || '--:--'}</p>
-              <p className="text-xs text-gray-500">{flight.arrivalCity || flight.destination}</p>
+              <p className="text-lg font-bold text-gray-900">{arrTime}</p>
+              <p className="text-xs text-gray-500">{arrCity}</p>
             </div>
           </div>
           <div className="flex gap-2">
-            {flight.cabinClass && (
-              <span className="badge bg-gray-100 text-gray-600">{flight.cabinClass}</span>
+            {cabin && (
+              <span className="badge bg-gray-100 text-gray-600">{cabin}</span>
             )}
             {flight.refundable && (
               <span className="badge bg-green-100 text-green-700">{t('flight.refundable')}</span>
@@ -499,6 +508,7 @@ function SearchContent() {
       </Link>
     </motion.div>
   );
+  };
 
   const renderActivityCard = (activity: any) => (
     <motion.div key={activity.id} variants={staggerItem}>
@@ -518,7 +528,7 @@ function SearchContent() {
             </h3>
             <div className="flex items-center gap-1 text-gray-500 text-sm mt-0.5">
               <MapPin className="w-3.5 h-3.5" />
-              {activity.destination || activity.city}
+              {typeof activity.destination === 'object' ? activity.destination?.city : activity.destination || activity.city}
             </div>
             <p className="text-gray-500 text-sm mt-2 line-clamp-2">{activity.description}</p>
             <div className="flex flex-wrap gap-1.5 mt-3">

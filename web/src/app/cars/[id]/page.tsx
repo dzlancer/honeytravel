@@ -266,7 +266,7 @@ export default function CarDetailPage() {
                       </div>
                       <div>
                         <p className="text-sm font-medium text-gray-900">{t('car.pickupLocation')}</p>
-                        <p className="text-sm text-gray-500">{car.pickupLocation}</p>
+                        <p className="text-sm text-gray-500">{typeof car.pickupLocation === 'object' ? `${car.pickupLocation.city} — ${car.pickupLocation.address}` : car.pickupLocation}</p>
                       </div>
                     </div>
                   )}
@@ -277,7 +277,7 @@ export default function CarDetailPage() {
                       </div>
                       <div>
                         <p className="text-sm font-medium text-gray-900">{t('car.dropoffLocation')}</p>
-                        <p className="text-sm text-gray-500">{car.dropoffLocation}</p>
+                        <p className="text-sm text-gray-500">{typeof car.dropoffLocation === 'object' ? `${car.dropoffLocation.city} — ${car.dropoffLocation.address}` : car.dropoffLocation}</p>
                       </div>
                     </div>
                   )}

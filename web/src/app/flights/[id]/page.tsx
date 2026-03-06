@@ -60,6 +60,20 @@ export default function FlightDetailPage() {
       .finally(() => setLoading(false));
   }, [id]);
 
+  // Extract segment data
+  const seg = flight?.segments?.[0];
+  const depTime = seg?.departure?.dateTime ? new Date(seg.departure.dateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '--:--';
+  const arrTime = seg?.arrival?.dateTime ? new Date(seg.arrival.dateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '--:--';
+  const depDate = seg?.departure?.dateTime ? new Date(seg.departure.dateTime).toLocaleDateString() : '';
+  const arrDate = seg?.arrival?.dateTime ? new Date(seg.arrival.dateTime).toLocaleDateString() : '';
+  const depCity = seg?.departure?.airport?.city || '';
+  const arrCity = seg?.arrival?.airport?.city || '';
+  const depAirport = seg?.departure?.airport?.name || '';
+  const arrAirport = seg?.arrival?.airport?.name || '';
+  const airlineName = seg?.airline || '';
+  const flightNum = seg?.flightNumber || '';
+  const cabinCls = seg?.cabinClass || 'economy';
+
   const pricePerPassenger = flight?.pricePerPassenger || flight?.price || 0;
   const totalAmount = pricePerPassenger * passengers;
   const pointsEarned = Math.floor(totalAmount * 10);
@@ -73,8 +87,8 @@ export default function FlightDetailPage() {
         productType: 'flight',
         productId: flight.id,
         supplierId: flight.supplierId,
-        checkIn: flight.departureDate || flight.departureTime,
-        checkOut: flight.arrivalDate || flight.arrivalTime,
+        checkIn: seg?.departure?.dateTime || '',
+        checkOut: seg?.arrival?.dateTime || '',
         guestCount: passengers,
         totalAmount,
         currency: flight.currency || 'USD',
@@ -118,14 +132,14 @@ export default function FlightDetailPage() {
                 <Plane className="w-5 h-5 text-primary-600" />
               </div>
               <div>
-                <h1 className="text-display-sm font-bold text-gray-900">{flight.airline}</h1>
-                {flight.flightNumber && (
-                  <p className="text-gray-500 text-sm">{t('flight.flightNumber')}: {flight.flightNumber}</p>
+                <h1 className="text-display-sm font-bold text-gray-900">{airlineName}</h1>
+                {flightNum && (
+                  <p className="text-gray-500 text-sm">{t('flight.flightNumber')}: {flightNum}</p>
                 )}
               </div>
             </div>
             <p className="text-gray-600">
-              {flight.departureCity || flight.origin} <ArrowRight className="w-4 h-4 inline mx-1" /> {flight.arrivalCity || flight.destination}
+              {depCity} <ArrowRight className="w-4 h-4 inline mx-1" /> {arrCity}
             </p>
           </div>
         </div>
@@ -139,13 +153,13 @@ export default function FlightDetailPage() {
               <div className="flex items-stretch gap-6">
                 {/* Departure */}
                 <div className="text-center min-w-[100px]">
-                  <p className="text-2xl font-bold text-gray-900">{flight.departureTime || '--:--'}</p>
-                  <p className="text-sm font-medium text-gray-700 mt-1">{flight.departureCity || flight.origin}</p>
-                  {flight.departureAirport && (
-                    <p className="text-xs text-gray-400">{flight.departureAirport}</p>
+                  <p className="text-2xl font-bold text-gray-900">{depTime}</p>
+                  <p className="text-sm font-medium text-gray-700 mt-1">{depCity}</p>
+                  {depAirport && (
+                    <p className="text-xs text-gray-400">{depAirport}</p>
                   )}
-                  {flight.departureDate && (
-                    <p className="text-xs text-gray-400 mt-1">{flight.departureDate}</p>
+                  {depDate && (
+                    <p className="text-xs text-gray-400 mt-1">{depDate}</p>
                   )}
                 </div>
 
@@ -153,7 +167,7 @@ export default function FlightDetailPage() {
                 <div className="flex-1 flex flex-col items-center justify-center py-2">
                   <span className="text-xs text-gray-500 mb-2 flex items-center gap-1">
                     <Clock className="w-3 h-3" />
-                    {flight.duration || 'N/A'}
+                    {flight.totalDuration || 'N/A'}
                   </span>
                   <div className="w-full h-0.5 bg-primary-200 relative rounded-full">
                     <div className="absolute -left-1 top-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-full bg-primary-600 border-2 border-white" />
@@ -172,13 +186,13 @@ export default function FlightDetailPage() {
 
                 {/* Arrival */}
                 <div className="text-center min-w-[100px]">
-                  <p className="text-2xl font-bold text-gray-900">{flight.arrivalTime || '--:--'}</p>
-                  <p className="text-sm font-medium text-gray-700 mt-1">{flight.arrivalCity || flight.destination}</p>
-                  {flight.arrivalAirport && (
-                    <p className="text-xs text-gray-400">{flight.arrivalAirport}</p>
+                  <p className="text-2xl font-bold text-gray-900">{arrTime}</p>
+                  <p className="text-sm font-medium text-gray-700 mt-1">{arrCity}</p>
+                  {arrAirport && (
+                    <p className="text-xs text-gray-400">{arrAirport}</p>
                   )}
-                  {flight.arrivalDate && (
-                    <p className="text-xs text-gray-400 mt-1">{flight.arrivalDate}</p>
+                  {arrDate && (
+                    <p className="text-xs text-gray-400 mt-1">{arrDate}</p>
                   )}
                 </div>
               </div>
@@ -194,7 +208,7 @@ export default function FlightDetailPage() {
                   </div>
                   <div>
                     <p className="text-sm font-medium text-gray-900">{t('flight.cabinClass')}</p>
-                    <p className="text-sm text-gray-500 capitalize">{flight.cabinClass || 'Economy'}</p>
+                    <p className="text-sm text-gray-500 capitalize">{cabinCls || 'Economy'}</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3 p-4 rounded-xl bg-gray-50">
