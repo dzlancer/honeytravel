@@ -18,6 +18,9 @@ import { ErrorState } from '@/components/ui/ErrorState';
 import { Skeleton } from '@/components/ui/Skeleton';
 import toast from 'react-hot-toast';
 import clsx from 'clsx';
+import { ReviewsList } from '@/components/ui/ReviewsList';
+import { FavoriteButton } from '@/components/ui/FavoriteButton';
+import { useRecentlyViewed } from '@/hooks/useRecentlyViewed';
 
 function CarDetailSkeleton() {
   return (
@@ -57,10 +60,21 @@ export default function CarDetailPage() {
   const [pickupDate, setPickupDate] = useState('');
   const [dropoffDate, setDropoffDate] = useState('');
   const [booking, setBooking] = useState(false);
+  const { addItem: addRecentlyViewed } = useRecentlyViewed();
 
   useEffect(() => {
     api.getCar(id as string)
-      .then(setCar)
+      .then((data) => {
+        setCar(data);
+        addRecentlyViewed({
+          productType: 'car_rental',
+          productId: data.id,
+          name: (data.make || '') + ' ' + (data.model || ''),
+          image: data.images?.[0] || '',
+          price: data.pricePerDay || data.price || 0,
+          currency: data.currency || 'USD',
+        });
+      })
       .catch(() => setError(true))
       .finally(() => setLoading(false));
   }, [id]);
@@ -142,15 +156,18 @@ export default function CarDetailPage() {
               )}
             </div>
           </div>
-          {car.avgRating > 0 && (
-            <div className="flex items-center gap-2 bg-primary-600 text-white px-3 py-1.5 rounded-xl">
-              <Star className="w-4 h-4 fill-current" />
-              <span className="font-bold">{car.avgRating}</span>
-              {car.reviewCount > 0 && (
-                <span className="text-white/70 text-sm">({car.reviewCount})</span>
-              )}
-            </div>
-          )}
+          <div className="flex items-center gap-2">
+            <FavoriteButton productType="car_rental" productId={car.id} />
+            {car.avgRating > 0 && (
+              <div className="flex items-center gap-2 bg-primary-600 text-white px-3 py-1.5 rounded-xl">
+                <Star className="w-4 h-4 fill-current" />
+                <span className="font-bold">{car.avgRating}</span>
+                {car.reviewCount > 0 && (
+                  <span className="text-white/70 text-sm">({car.reviewCount})</span>
+                )}
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Image Gallery */}
@@ -284,6 +301,9 @@ export default function CarDetailPage() {
                 </div>
               </section>
             )}
+
+            {/* Reviews */}
+            <ReviewsList productType="car_rental" productId={car.id} />
           </div>
 
           {/* Booking Sidebar */}

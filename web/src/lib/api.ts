@@ -192,6 +192,58 @@ class ApiClient {
   getCar(id: string) {
     return this.request<any>(`/suppliers/cars/${id}`);
   }
+
+  // Reviews
+  getProductReviews(productType: string, productId: string, page = 1, limit = 10) {
+    return this.request<any>(`/reviews/product/${productType}/${productId}?page=${page}&limit=${limit}`);
+  }
+
+  createReview(data: { productType: string; productId: string; rating: number; title: string; comment: string; images?: string[] }) {
+    return this.request<any>('/reviews', { method: 'POST', body: JSON.stringify(data) });
+  }
+
+  markReviewHelpful(reviewId: string) {
+    return this.request<any>(`/reviews/${reviewId}/helpful`, { method: 'PATCH' });
+  }
+
+  getMyReviews(page = 1) {
+    return this.request<any>(`/reviews/my?page=${page}`);
+  }
+
+  // Favorites
+  getFavorites(type?: string) {
+    const qs = type ? `?type=${type}` : '';
+    return this.request<any>(`/favorites${qs}`);
+  }
+
+  addFavorite(productType: string, productId: string) {
+    return this.request<any>('/favorites', { method: 'POST', body: JSON.stringify({ productType, productId }) });
+  }
+
+  removeFavorite(productType: string, productId: string) {
+    return this.request<any>(`/favorites/${productType}/${productId}`, { method: 'DELETE' });
+  }
+
+  checkFavorite(productType: string, productId: string) {
+    return this.request<any>(`/favorites/check/${productType}/${productId}`);
+  }
+
+  // Notifications
+  getNotifications(page = 1) {
+    return this.request<any>(`/notifications?page=${page}`);
+  }
+
+  getUnreadCount() {
+    return this.request<any>('/notifications/unread-count');
+  }
+
+  markNotificationRead(id: string) {
+    return this.request<any>(`/notifications/${id}/read`, { method: 'PATCH' });
+  }
+
+  markAllNotificationsRead() {
+    return this.request<any>('/notifications/read-all', { method: 'PATCH' });
+  }
 }
 
 export const api = new ApiClient();

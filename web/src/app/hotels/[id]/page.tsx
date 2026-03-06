@@ -17,6 +17,9 @@ import { ImageGallery } from '@/components/ui/ImageGallery';
 import { StarRating } from '@/components/ui/StarRating';
 import { ErrorState } from '@/components/ui/ErrorState';
 import { HotelDetailSkeleton } from '@/components/ui/Skeleton';
+import { ReviewsList } from '@/components/ui/ReviewsList';
+import { FavoriteButton } from '@/components/ui/FavoriteButton';
+import { useRecentlyViewed } from '@/hooks/useRecentlyViewed';
 import toast from 'react-hot-toast';
 import clsx from 'clsx';
 
@@ -37,10 +40,21 @@ export default function HotelDetailPage() {
   const [checkIn, setCheckIn] = useState('');
   const [checkOut, setCheckOut] = useState('');
   const [guests, setGuests] = useState(2);
+  const { addItem: addRecentlyViewed } = useRecentlyViewed();
 
   useEffect(() => {
     api.getHotel(id as string)
-      .then(setHotel)
+      .then((data) => {
+        setHotel(data);
+        addRecentlyViewed({
+          productType: 'hotel',
+          productId: data.id,
+          name: data.name,
+          image: data.images?.[0] || '',
+          price: data.rooms?.[0]?.pricePerNight || 0,
+          currency: data.rooms?.[0]?.currency || 'USD',
+        });
+      })
       .catch(() => setError(true))
       .finally(() => setLoading(false));
   }, [id]);
@@ -118,9 +132,7 @@ export default function HotelDetailPage() {
                 )}
               </div>
             )}
-            <button className="btn-icon btn-ghost border border-gray-200">
-              <Heart className="w-5 h-5 text-gray-400" />
-            </button>
+            <FavoriteButton productType="hotel" productId={hotel.id} />
             <button className="btn-icon btn-ghost border border-gray-200">
               <Share2 className="w-5 h-5 text-gray-400" />
             </button>
@@ -243,6 +255,9 @@ export default function HotelDetailPage() {
                 </div>
               </section>
             )}
+
+            {/* Reviews */}
+            <ReviewsList productType="hotel" productId={hotel.id} />
           </div>
 
           {/* Booking Sidebar */}

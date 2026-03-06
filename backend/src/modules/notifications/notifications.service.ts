@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, IsNull } from 'typeorm';
 import { InjectQueue } from '@nestjs/bull';
 import { Queue } from 'bull';
 import { Notification, NotificationType, NotificationStatus } from './entities/notification.entity';
@@ -70,6 +70,40 @@ export class NotificationsService {
       where: { userId },
       order: { createdAt: 'DESC' },
       take: limit,
+    });
+  }
+
+  async findByUserPaginated(userId: string, page = 1, limit = 20) {
+    const [notifications, total] = await this.notificationRepo.findAndCount({
+      where: { userId },
+      order: { createdAt: 'DESC' },
+      skip: (page - 1) * limit,
+      take: limit,
+    });
+    const unreadCount = await this.getUnreadCount(userId);
+    return { notifications, total, page, limit, unreadCount };
+  }
+
+  async markAsRead(id: string, userId: string) {
+    await this.notificationRepo.update(
+      { id, userId },
+      { readAt: new Date() },
+    );
+    return this.notificationRepo.findOne({ where: { id } });
+  }
+
+  async markAllAsRead(userId: string) {
+    await this.notificationRepo
+      .createQueryBuilder()
+      .update()
+      .set({ readAt: new Date() })
+      .where('userId = :userId AND readAt IS NULL', { userId })
+      .execute();
+  }
+
+  async getUnreadCount(userId: string): Promise<number> {
+    return this.notificationRepo.count({
+      where: { userId, readAt: IsNull() },
     });
   }
 }

@@ -6,6 +6,8 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/hooks/useAuth';
 import { Logo } from '@/components/ui/Logo';
 import { LanguageSwitcher } from '@/components/ui/LanguageSwitcher';
+import { CurrencySwitcher } from '@/components/ui/CurrencySwitcher';
+import { NotificationBell } from '@/components/ui/NotificationBell';
 import clsx from 'clsx';
 
 const NAV_LINKS = [
@@ -74,7 +76,9 @@ export function Header() {
 
             {/* Right Side */}
             <div className="hidden lg:flex items-center gap-2">
+              <CurrencySwitcher />
               <LanguageSwitcher />
+              {user && <NotificationBell />}
 
               {user ? (
                 <div ref={profileRef} className="relative">
@@ -106,9 +110,11 @@ export function Header() {
                       </div>
                       <div className="py-1">
                         {[
+                          { href: '/dashboard', label: t('dashboard.title'), icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0a1 1 0 01-1-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 01-1 1' },
                           { href: '/profile', label: t('common.profile'), icon: 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z' },
                           { href: '/bookings', label: t('common.myBookings'), icon: 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2' },
-                          { href: '/loyalty', label: 'Loyalty Points', icon: 'M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z' },
+                          { href: '/wishlist', label: t('wishlist.title'), icon: 'M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z' },
+                          { href: '/loyalty', label: t('loyalty.title'), icon: 'M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z' },
                         ].map((item) => (
                           <Link key={item.href} href={item.href}
                             className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50"
@@ -209,6 +215,10 @@ export function Header() {
                       <p className="font-medium text-gray-900">{user.firstName} {user.lastName}</p>
                       <p className="text-sm text-gray-500">{user.email}</p>
                     </div>
+                    <Link href="/dashboard" onClick={() => setMobileOpen(false)}
+                      className="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 hover:bg-gray-50">
+                      {t('dashboard.title')}
+                    </Link>
                     <Link href="/profile" onClick={() => setMobileOpen(false)}
                       className="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 hover:bg-gray-50">
                       {t('common.profile')}
@@ -216,6 +226,14 @@ export function Header() {
                     <Link href="/bookings" onClick={() => setMobileOpen(false)}
                       className="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 hover:bg-gray-50">
                       {t('common.myBookings')}
+                    </Link>
+                    <Link href="/wishlist" onClick={() => setMobileOpen(false)}
+                      className="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 hover:bg-gray-50">
+                      {t('wishlist.title')}
+                    </Link>
+                    <Link href="/notifications" onClick={() => setMobileOpen(false)}
+                      className="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 hover:bg-gray-50">
+                      {t('notifications.title')}
                     </Link>
                     <button onClick={() => { logout(); setMobileOpen(false); }}
                       className="flex items-center gap-3 w-full px-4 py-3 rounded-xl text-error-600 hover:bg-error-50 mt-2">
@@ -233,7 +251,8 @@ export function Header() {
                   </div>
                 )}
               </nav>
-              <div className="border-t border-gray-100 p-4">
+              <div className="border-t border-gray-100 p-4 space-y-3">
+                <CurrencySwitcher />
                 <LanguageSwitcher />
               </div>
             </div>

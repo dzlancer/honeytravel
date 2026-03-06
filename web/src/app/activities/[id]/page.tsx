@@ -18,6 +18,9 @@ import { ErrorState } from '@/components/ui/ErrorState';
 import { Skeleton } from '@/components/ui/Skeleton';
 import toast from 'react-hot-toast';
 import clsx from 'clsx';
+import { ReviewsList } from '@/components/ui/ReviewsList';
+import { FavoriteButton } from '@/components/ui/FavoriteButton';
+import { useRecentlyViewed } from '@/hooks/useRecentlyViewed';
 
 function ActivityDetailSkeleton() {
   return (
@@ -58,12 +61,21 @@ export default function ActivityDetailPage() {
   const [date, setDate] = useState('');
   const [groupSize, setGroupSize] = useState(2);
   const [booking, setBooking] = useState(false);
+  const { addItem: addRecentlyViewed } = useRecentlyViewed();
 
   useEffect(() => {
     api.getActivity(id as string)
       .then((data) => {
         setActivity(data);
         if (data.groupSize?.min) setGroupSize(data.groupSize.min);
+        addRecentlyViewed({
+          productType: 'activity',
+          productId: data.id,
+          name: data.name,
+          image: data.images?.[0] || '',
+          price: data.pricePerPerson || data.price || 0,
+          currency: data.currency || 'USD',
+        });
       })
       .catch(() => setError(true))
       .finally(() => setLoading(false));
@@ -157,6 +169,7 @@ export default function ActivityDetailPage() {
             </div>
           </div>
           <div className="flex items-center gap-2">
+            <FavoriteButton productType="activity" productId={activity.id} />
             {activity.avgRating > 0 && (
               <div className="flex items-center gap-2 bg-primary-600 text-white px-3 py-1.5 rounded-xl">
                 <Star className="w-4 h-4 fill-current" />
@@ -280,6 +293,9 @@ export default function ActivityDetailPage() {
                 </div>
               </section>
             )}
+
+            {/* Reviews */}
+            <ReviewsList productType="activity" productId={activity.id} />
           </div>
 
           {/* Booking Sidebar */}

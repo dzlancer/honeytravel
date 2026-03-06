@@ -4,6 +4,8 @@ import {
 } from 'typeorm';
 import { Booking } from '../../bookings/entities/booking.entity';
 import { LoyaltyTransaction } from '../../loyalty/entities/loyalty-transaction.entity';
+import { Review } from '../../reviews/entities/review.entity';
+import { Favorite } from '../../favorites/entities/favorite.entity';
 
 export enum UserRole {
   CUSTOMER = 'customer',
@@ -64,6 +66,12 @@ export class User {
 
   @OneToMany(() => LoyaltyTransaction, (lt) => lt.user)
   loyaltyTransactions: LoyaltyTransaction[];
+
+  @OneToMany(() => Review, (review) => review.user)
+  reviews: Review[];
+
+  @OneToMany(() => Favorite, (fav) => fav.user)
+  favorites: Favorite[];
 
   @CreateDateColumn()
   createdAt: Date;

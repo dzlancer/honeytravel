@@ -17,6 +17,9 @@ import { ErrorState } from '@/components/ui/ErrorState';
 import { Skeleton } from '@/components/ui/Skeleton';
 import toast from 'react-hot-toast';
 import clsx from 'clsx';
+import { ReviewsList } from '@/components/ui/ReviewsList';
+import { FavoriteButton } from '@/components/ui/FavoriteButton';
+import { useRecentlyViewed } from '@/hooks/useRecentlyViewed';
 
 function FlightDetailSkeleton() {
   return (
@@ -52,10 +55,21 @@ export default function FlightDetailPage() {
   const [error, setError] = useState(false);
   const [passengers, setPassengers] = useState(1);
   const [booking, setBooking] = useState(false);
+  const { addItem: addRecentlyViewed } = useRecentlyViewed();
 
   useEffect(() => {
     api.getFlight(id as string)
-      .then(setFlight)
+      .then((data) => {
+        setFlight(data);
+        addRecentlyViewed({
+          productType: 'flight',
+          productId: data.id,
+          name: (data.segments?.[0]?.airline || '') + ' ' + (data.segments?.[0]?.flightNumber || ''),
+          image: '',
+          price: data.price || 0,
+          currency: data.currency || 'USD',
+        });
+      })
       .catch(() => setError(true))
       .finally(() => setLoading(false));
   }, [id]);
@@ -141,6 +155,9 @@ export default function FlightDetailPage() {
             <p className="text-gray-600">
               {depCity} <ArrowRight className="w-4 h-4 inline mx-1" /> {arrCity}
             </p>
+          </div>
+          <div className="flex items-center gap-2">
+            <FavoriteButton productType="flight" productId={flight.id} />
           </div>
         </div>
 
@@ -248,6 +265,9 @@ export default function FlightDetailPage() {
                 </div>
               </div>
             </section>
+
+            {/* Reviews */}
+            <ReviewsList productType="flight" productId={flight.id} />
           </div>
 
           {/* Booking Sidebar */}

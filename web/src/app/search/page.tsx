@@ -19,6 +19,7 @@ import { Pagination } from '@/components/ui/Pagination';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { SearchCardSkeleton } from '@/components/ui/Skeleton';
 import { staggerContainer, staggerItem } from '@/components/ui/PageTransition';
+import { FavoriteButton } from '@/components/ui/FavoriteButton';
 import clsx from 'clsx';
 
 const AMENITY_ICONS: Record<string, any> = {
@@ -391,6 +392,9 @@ function SearchContent() {
             fill
             className="object-cover transition-transform duration-300 group-hover:scale-105"
           />
+          <div className="absolute top-2 right-2 rtl:right-auto rtl:left-2 z-10">
+            <FavoriteButton productType="hotel" productId={hotel.id} size="sm" />
+          </div>
           {hotel.avgRating > 0 && (
             <div className="absolute top-3 end-3 bg-primary-600 text-white text-xs font-bold px-2 py-1 rounded-lg">
               {hotel.avgRating}
@@ -458,12 +462,13 @@ function SearchContent() {
             <div className="w-8 h-8 rounded-lg bg-primary-100 flex items-center justify-center">
               <Plane className="w-4 h-4 text-primary-600" />
             </div>
-            <div>
+            <div className="flex-1">
               <span className="font-semibold text-gray-900">{airline}</span>
               {flightNum && (
                 <span className="text-gray-400 text-xs ms-2">{flightNum}</span>
               )}
             </div>
+            <FavoriteButton productType="flight" productId={flight.id} size="sm" />
           </div>
           <div className="flex items-center gap-4 mb-3">
             <div className="text-center">
@@ -520,6 +525,9 @@ function SearchContent() {
             fill
             className="object-cover transition-transform duration-300 group-hover:scale-105"
           />
+          <div className="absolute top-2 right-2 rtl:right-auto rtl:left-2 z-10">
+            <FavoriteButton productType="activity" productId={activity.id} size="sm" />
+          </div>
         </div>
         <div className="p-4 sm:p-5 flex-1 flex flex-col justify-between">
           <div>
@@ -590,6 +598,9 @@ function SearchContent() {
             fill
             className="object-cover transition-transform duration-300 group-hover:scale-105"
           />
+          <div className="absolute top-2 right-2 rtl:right-auto rtl:left-2 z-10">
+            <FavoriteButton productType="car_rental" productId={car.id} size="sm" />
+          </div>
         </div>
         <div className="p-4 sm:p-5 flex-1 flex flex-col justify-between">
           <div>
