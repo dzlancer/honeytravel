@@ -29,11 +29,22 @@ export const metadata: Metadata = {
     'voyage', 'alg\u00e9rie', 'h\u00f4tels', 'r\u00e9servation', '\u0633\u0641\u0631', '\u0627\u0644\u062c\u0632\u0627\u0626\u0631', '\u0641\u0646\u0627\u062f\u0642',
   ],
   metadataBase: new URL('https://travelshopalgeria.com'),
+  manifest: '/site.webmanifest',
   openGraph: {
     type: 'website',
     locale: 'fr_DZ',
     alternateLocale: ['en_US', 'ar_DZ'],
     siteName: 'Travel Shop Algeria',
+    images: [{ url: '/og-image.jpg', width: 1200, height: 630 }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    site: '@travelshopalgeria',
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: { index: true, follow: true },
   },
 };
 

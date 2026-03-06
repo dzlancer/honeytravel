@@ -20,6 +20,7 @@ import { HotelDetailSkeleton } from '@/components/ui/Skeleton';
 import { ReviewsList } from '@/components/ui/ReviewsList';
 import { FavoriteButton } from '@/components/ui/FavoriteButton';
 import { useRecentlyViewed } from '@/hooks/useRecentlyViewed';
+import { setPageMeta } from '@/lib/metadata';
 import toast from 'react-hot-toast';
 import clsx from 'clsx';
 
@@ -46,6 +47,11 @@ export default function HotelDetailPage() {
     api.getHotel(id as string)
       .then((data) => {
         setHotel(data);
+        setPageMeta({
+          title: data.name,
+          description: `Book ${data.name} in ${data.address?.city || 'Algeria'}. ${data.starRating}-star hotel starting from ${data.rooms?.[0]?.pricePerNight || ''}/night.`,
+          image: data.images?.[0],
+        });
         addRecentlyViewed({
           productType: 'hotel',
           productId: data.id,

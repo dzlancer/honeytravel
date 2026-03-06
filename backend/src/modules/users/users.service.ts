@@ -23,6 +23,10 @@ export class UsersService {
     return this.usersRepo.findOne({ where: { id } });
   }
 
+  async findByResetToken(token: string): Promise<User | null> {
+    return this.usersRepo.findOne({ where: { passwordResetToken: token } });
+  }
+
   async updateRefreshToken(id: string, refreshToken: string | null): Promise<void> {
     await this.usersRepo.update(id, { refreshToken: refreshToken ?? undefined });
   }

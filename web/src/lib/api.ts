@@ -87,6 +87,20 @@ class ApiClient {
     });
   }
 
+  forgotPassword(email: string) {
+    return this.request<{ message: string }>('/auth/forgot-password', {
+      method: 'POST',
+      body: JSON.stringify({ email }),
+    });
+  }
+
+  resetPassword(token: string, password: string) {
+    return this.request<{ message: string }>('/auth/reset-password', {
+      method: 'POST',
+      body: JSON.stringify({ token, password }),
+    });
+  }
+
   logout() {
     return this.request('/auth/logout', { method: 'POST' }).finally(() => {
       this.setToken(null);
@@ -243,6 +257,39 @@ class ApiClient {
 
   markAllNotificationsRead() {
     return this.request<any>('/notifications/read-all', { method: 'PATCH' });
+  }
+
+  // Admin
+  getAdminStats() {
+    return this.request<any>('/admin/dashboard');
+  }
+
+  getAdminUsers() {
+    return this.request<any>('/admin/users');
+  }
+
+  getAdminBookings(limit = 20) {
+    return this.request<any>(`/admin/bookings?limit=${limit}`);
+  }
+
+  getAdminPromos() {
+    return this.request<any>('/admin/promos');
+  }
+
+  createAdminPromo(data: any) {
+    return this.request<any>('/admin/promos', { method: 'POST', body: JSON.stringify(data) });
+  }
+
+  getAdminCampaigns() {
+    return this.request<any>('/admin/campaigns');
+  }
+
+  createAdminCampaign(data: any) {
+    return this.request<any>('/admin/campaigns', { method: 'POST', body: JSON.stringify(data) });
+  }
+
+  sendCampaign(id: string) {
+    return this.request<any>(`/admin/campaigns/${id}/send`, { method: 'PUT' });
   }
 }
 

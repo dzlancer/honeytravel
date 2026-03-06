@@ -20,6 +20,7 @@ import clsx from 'clsx';
 import { ReviewsList } from '@/components/ui/ReviewsList';
 import { FavoriteButton } from '@/components/ui/FavoriteButton';
 import { useRecentlyViewed } from '@/hooks/useRecentlyViewed';
+import { setPageMeta } from '@/lib/metadata';
 
 function FlightDetailSkeleton() {
   return (
@@ -61,6 +62,11 @@ export default function FlightDetailPage() {
     api.getFlight(id as string)
       .then((data) => {
         setFlight(data);
+        const seg = data.segments?.[0];
+        setPageMeta({
+          title: `${seg?.origin || ''} → ${seg?.destination || ''} Flight`,
+          description: `Book ${seg?.airline || ''} flight ${seg?.flightNumber || ''} from ${seg?.origin || ''} to ${seg?.destination || ''}. Duration: ${data.duration || ''}.`,
+        });
         addRecentlyViewed({
           productType: 'flight',
           productId: data.id,

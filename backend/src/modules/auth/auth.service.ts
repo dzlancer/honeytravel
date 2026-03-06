@@ -4,6 +4,7 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
+import * as crypto from 'crypto';
 import { UsersService } from '../users/users.service';
 import { User } from '../users/entities/user.entity';
 
@@ -25,6 +26,9 @@ export class AuthService {
       passwordHash,
     });
 
+    // In production, queue a verification email here
+    // await this.notificationsService.queueEmail(user.email, 'verify', { token });
+
     return this.generateTokens(user);
   }
 
@@ -36,6 +40,56 @@ export class AuthService {
     if (!isValid) throw new UnauthorizedException('Invalid credentials');
 
     return this.generateTokens(user);
+  }
+
+  async forgotPassword(email: string) {
+    const user = await this.usersService.findByEmail(email);
+    // Always return success to prevent email enumeration
+    if (!user) return { message: 'If an account exists, a reset link has been sent.' };
+
+    const resetToken = crypto.randomBytes(32).toString('hex');
+    const resetExpires = new Date(Date.now() + 3600000); // 1 hour
+
+    await this.usersService.updateProfile(user.id, {
+      passwordResetToken: resetToken,
+      passwordResetExpires: resetExpires,
+    });
+
+    // In production, send email with reset link:
+    // https://travelshopalgeria.com/reset-password?token=<resetToken>
+    console.log(`[Auth] Password reset token for ${email}: ${resetToken}`);
+
+    return { message: 'If an account exists, a reset link has been sent.' };
+  }
+
+  async resetPassword(token: string, newPassword: string) {
+    const user = await this.usersService.findByResetToken(token);
+    if (!user) throw new BadRequestException('Invalid or expired reset token');
+
+    if (!user.passwordResetExpires || user.passwordResetExpires < new Date()) {
+      throw new BadRequestException('Reset token has expired');
+    }
+
+    const passwordHash = await bcrypt.hash(newPassword, 12);
+    await this.usersService.updateProfile(user.id, {
+      passwordHash,
+      passwordResetToken: undefined as any,
+      passwordResetExpires: undefined as any,
+    });
+
+    return { message: 'Password has been reset successfully' };
+  }
+
+  async verifyEmail(token: string) {
+    try {
+      const payload = this.jwtService.verify(token);
+      await this.usersService.updateProfile(payload.sub, {
+        isEmailVerified: true,
+      });
+      return { message: 'Email verified successfully' };
+    } catch {
+      throw new BadRequestException('Invalid or expired verification token');
+    }
   }
 
   async refreshTokens(refreshToken: string) {
@@ -71,7 +125,7 @@ export class AuthService {
     return {
       accessToken,
       refreshToken,
-      expiresIn: 900, // 15 minutes in seconds
+      expiresIn: 900,
       user: {
         id: user.id,
         email: user.email,

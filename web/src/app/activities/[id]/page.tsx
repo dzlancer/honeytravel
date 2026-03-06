@@ -21,6 +21,7 @@ import clsx from 'clsx';
 import { ReviewsList } from '@/components/ui/ReviewsList';
 import { FavoriteButton } from '@/components/ui/FavoriteButton';
 import { useRecentlyViewed } from '@/hooks/useRecentlyViewed';
+import { setPageMeta } from '@/lib/metadata';
 
 function ActivityDetailSkeleton() {
   return (
@@ -67,6 +68,11 @@ export default function ActivityDetailPage() {
     api.getActivity(id as string)
       .then((data) => {
         setActivity(data);
+        setPageMeta({
+          title: data.name,
+          description: `Book ${data.name} in ${data.location?.city || 'Algeria'}. ${data.duration || ''} ${data.category || 'activity'} starting from $${data.pricePerPerson || data.price || ''}/person.`,
+          image: data.images?.[0],
+        });
         if (data.groupSize?.min) setGroupSize(data.groupSize.min);
         addRecentlyViewed({
           productType: 'activity',

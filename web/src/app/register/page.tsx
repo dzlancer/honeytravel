@@ -193,6 +193,10 @@ export default function RegisterPage() {
                 t('auth.signUp')
               )}
             </button>
+
+            <p className="text-xs text-gray-400 text-center mt-3">
+              {t('auth.verificationNotice', 'A verification email will be sent to confirm your address.')}
+            </p>
           </form>
 
           {/* Social login */}

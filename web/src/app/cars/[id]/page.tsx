@@ -21,6 +21,7 @@ import clsx from 'clsx';
 import { ReviewsList } from '@/components/ui/ReviewsList';
 import { FavoriteButton } from '@/components/ui/FavoriteButton';
 import { useRecentlyViewed } from '@/hooks/useRecentlyViewed';
+import { setPageMeta } from '@/lib/metadata';
 
 function CarDetailSkeleton() {
   return (
@@ -66,6 +67,11 @@ export default function CarDetailPage() {
     api.getCar(id as string)
       .then((data) => {
         setCar(data);
+        setPageMeta({
+          title: `${data.make || ''} ${data.model || ''} Rental`,
+          description: `Rent a ${data.make || ''} ${data.model || ''} in Algeria. ${data.category || ''} ${data.transmission || ''}, $${data.pricePerDay || data.price || ''}/day.`,
+          image: data.images?.[0],
+        });
         addRecentlyViewed({
           productType: 'car_rental',
           productId: data.id,

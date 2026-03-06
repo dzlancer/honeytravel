@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /api/
+Disallow: /checkout/
+Disallow: /reset-password
+
+Sitemap: https://travelshopalgeria.com/sitemap.xml

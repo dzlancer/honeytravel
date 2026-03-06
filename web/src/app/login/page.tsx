@@ -99,7 +99,7 @@ export default function LoginPage() {
             <div>
               <div className="flex items-center justify-between mb-1.5">
                 <label className="input-label !mb-0">{t('auth.password')}</label>
-                <Link href="#" className="text-xs text-primary-600 hover:text-primary-700 font-medium">
+                <Link href="/forgot-password" className="text-xs text-primary-600 hover:text-primary-700 font-medium">
                   {t('auth.forgotPassword')}
                 </Link>
               </div>
