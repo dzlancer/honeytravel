@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useTranslation } from 'react-i18next';
 import { Bell, BookOpen, CreditCard, Award, X } from 'lucide-react';
 import { useNotifications } from '@/hooks/useNotifications';
+import type { Notification as TsaNotification } from '@shared/types';
 import clsx from 'clsx';
 
 const EVENT_ICONS: Record<string, React.ElementType> = {
@@ -71,8 +72,8 @@ export function NotificationBell() {
 
           <div className="max-h-80 overflow-y-auto">
             {recent.length > 0 ? (
-              recent.map((n: any) => {
-                const Icon = EVENT_ICONS[n.event] || Bell;
+              recent.map((n: TsaNotification) => {
+                const Icon = (n.event ? EVENT_ICONS[n.event] : undefined) || Bell;
                 const isUnread = !n.readAt;
                 return (
                   <button

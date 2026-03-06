@@ -31,7 +31,7 @@ export function Footer() {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="bg-primary-950 text-gray-300">
+    <footer className="bg-primary-950 text-gray-300" role="contentinfo" aria-label="Footer navigation">
       {/* Main Footer */}
       <div className="section py-16">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 lg:gap-8">

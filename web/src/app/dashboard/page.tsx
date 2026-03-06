@@ -8,6 +8,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useFavorites } from '@/hooks/useFavorites';
 import { api } from '@/lib/api';
 import { formatCurrency } from '@/lib/currency';
+import type { Booking } from '@shared/types';
 import { PageTransition } from '@/components/ui/PageTransition';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { RecentlyViewed } from '@/components/ui/RecentlyViewed';
@@ -41,7 +42,7 @@ export default function DashboardPage() {
     loyaltyPoints: 0,
     reviewsCount: 0,
   });
-  const [upcomingBookings, setUpcomingBookings] = useState<any[]>([]);
+  const [upcomingBookings, setUpcomingBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -66,7 +67,7 @@ export default function DashboardPage() {
 
         const today = new Date().toISOString().split('T')[0];
         const upcoming = (bookings.bookings || []).filter(
-          (b: any) => (b.status === 'confirmed' || b.status === 'pending') && b.checkIn >= today
+          (b: Booking) => (b.status === 'confirmed' || b.status === 'pending') && b.checkIn >= today
         );
 
         setUpcomingBookings(upcoming.slice(0, 3));

@@ -4,3 +4,7 @@ export * from './supplier';
 export * from './payment';
 export * from './search';
 export * from './marketing';
+export * from './review';
+export * from './notification';
+export * from './favorite';
+export * from './api';

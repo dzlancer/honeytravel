@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { MessageSquarePlus } from 'lucide-react';
 import { api } from '@/lib/api';
 import { useAuth } from '@/hooks/useAuth';
+import type { ReviewsResponse, Review } from '@shared/types';
 import { ReviewCard } from '@/components/ui/ReviewCard';
 import { RatingDistribution } from '@/components/ui/RatingDistribution';
 import { WriteReviewModal } from '@/components/ui/WriteReviewModal';
@@ -18,7 +19,7 @@ interface ReviewsListProps {
 export function ReviewsList({ productType, productId }: ReviewsListProps) {
   const { t } = useTranslation();
   const { user } = useAuth();
-  const [data, setData] = useState<any>(null);
+  const [data, setData] = useState<ReviewsResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [showWrite, setShowWrite] = useState(false);
@@ -85,7 +86,7 @@ export function ReviewsList({ productType, productId }: ReviewsListProps) {
 
       {reviews.length > 0 ? (
         <div className="space-y-3">
-          {reviews.map((review: any) => (
+          {reviews.map((review: Review) => (
             <ReviewCard key={review.id} review={review} />
           ))}
         </div>

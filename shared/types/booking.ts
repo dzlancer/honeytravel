@@ -7,13 +7,14 @@ export enum BookingStatus {
   REFUNDED = 'refunded',
 }
 
-export enum ProductType {
-  HOTEL = 'hotel',
-  FLIGHT = 'flight',
-  ACTIVITY = 'activity',
-  PACKAGE = 'package',
-  CAR_RENTAL = 'car_rental',
-}
+export const ProductType = {
+  HOTEL: 'hotel',
+  FLIGHT: 'flight',
+  ACTIVITY: 'activity',
+  PACKAGE: 'package',
+  CAR_RENTAL: 'car_rental',
+} as const;
+export type ProductType = (typeof ProductType)[keyof typeof ProductType];
 
 export interface Booking {
   id: string;
@@ -52,6 +53,7 @@ export interface CreateBookingDto {
   checkOut: string;
   guestCount: number;
   guestDetails: GuestDetail[];
+  totalAmount?: number;
   currency: string;
   loyaltyPointsToUse?: number;
   promoCode?: string;

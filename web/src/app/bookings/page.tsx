@@ -4,8 +4,10 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { api } from '@/lib/api';
+import { getErrorMessage } from '@/lib/errors';
 import { formatCurrency } from '@/lib/currency';
 import { useAuth } from '@/hooks/useAuth';
+import type { Booking } from '@shared/types';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Calendar, Users, CalendarX2, History, XCircle, ChevronDown, X, SearchX, Award } from 'lucide-react';
@@ -30,7 +32,7 @@ export default function BookingsPage() {
   const { user } = useAuth();
   const router = useRouter();
   const { t } = useTranslation();
-  const [data, setData] = useState<any>({ bookings: [], total: 0 });
+  const [data, setData] = useState<{ bookings: Booking[]; total: number }>({ bookings: [], total: 0 });
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<TabKey>('active');
   const [expandedId, setExpandedId] = useState<string | null>(null);
@@ -50,20 +52,20 @@ export default function BookingsPage() {
     try {
       await api.cancelBooking(id);
       toast.success(t('booking.cancelBooking'));
-      setData((prev: any) => ({
+      setData((prev) => ({
         ...prev,
-        bookings: prev.bookings.map((b: any) =>
-          b.id === id ? { ...b, status: 'cancelled' } : b,
+        bookings: prev.bookings.map((b: Booking) =>
+          b.id === id ? { ...b, status: 'cancelled' as Booking['status'] } : b,
         ),
       }));
       setCancelModal(null);
-    } catch (error: any) {
-      toast.error(error.message || 'Failed to cancel');
+    } catch (error: unknown) {
+      toast.error(getErrorMessage(error));
     }
   };
 
   const currentTabStatuses = TABS.find((tab) => tab.key === activeTab)?.statuses || [];
-  const filteredBookings = (data.bookings || []).filter((b: any) => currentTabStatuses.includes(b.status));
+  const filteredBookings = (data.bookings || []).filter((b: Booking) => currentTabStatuses.includes(b.status));
   const totalPages = Math.ceil((data.total || 0) / 10);
 
   return (

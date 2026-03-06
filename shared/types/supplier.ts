@@ -133,6 +133,10 @@ export interface FlightSegment {
   flightNumber: string;
   departure: { airport: Airport; dateTime: string };
   arrival: { airport: Airport; dateTime: string };
+  /** Shorthand for departure.airport.city */
+  origin?: string;
+  /** Shorthand for arrival.airport.city */
+  destination?: string;
   duration: string;
   cabinClass: string;
 }
@@ -144,7 +148,11 @@ export interface Flight {
   segments: FlightSegment[];
   stops: number;
   totalDuration: string;
+  /** Alias for totalDuration */
+  duration?: string;
   price: number;
+  /** Per-passenger price (may differ from total price) */
+  pricePerPassenger?: number;
   currency: string;
   seatsAvailable: number;
   baggage: { cabin: string; checked: string };
@@ -176,13 +184,15 @@ export interface Activity {
   description: string;
   category: string;
   destination: { city: string; country: string };
-  location: GeoLocation;
+  location: GeoLocation & { city?: string };
   duration: string;
   groupSize: { min: number; max: number };
   difficulty: 'easy' | 'moderate' | 'challenging';
   includes: string[];
   images: string[];
   price: number;
+  /** Alias for price, per-person pricing */
+  pricePerPerson?: number;
   currency: string;
   avgRating: number;
   reviewCount: number;
@@ -223,6 +233,8 @@ export interface CarRental {
   pickupLocation: { city: string; address: string };
   dropoffLocation: { city: string; address: string };
   pricePerDay: number;
+  /** Alias for pricePerDay */
+  price?: number;
   currency: string;
   images: string[];
   mileagePolicy: string;

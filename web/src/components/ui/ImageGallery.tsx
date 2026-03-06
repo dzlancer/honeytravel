@@ -25,10 +25,25 @@ export function ImageGallery({ images, alt }: ImageGalleryProps) {
 
   const extraCount = safeImages.length - MAX_THUMBS;
 
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'ArrowLeft') {
+      e.preventDefault();
+      setSelectedIndex((prev) => (prev > 0 ? prev - 1 : safeImages.length - 1));
+    } else if (e.key === 'ArrowRight') {
+      e.preventDefault();
+      setSelectedIndex((prev) => (prev < safeImages.length - 1 ? prev + 1 : 0));
+    }
+  };
+
   return (
-    <div className="space-y-3">
+    <div className="space-y-3" role="group" aria-label="Image gallery">
       {/* Main Image */}
-      <div className="relative aspect-[16/9] rounded-xl overflow-hidden bg-gray-100">
+      <div
+        className="relative aspect-[16/9] rounded-xl overflow-hidden bg-gray-100"
+        tabIndex={0}
+        onKeyDown={handleKeyDown}
+        aria-label={`Image ${selectedIndex + 1} of ${safeImages.length}. Use arrow keys to navigate.`}
+      >
         <AnimatePresence mode="wait">
           <motion.div
             key={selectedIndex}
@@ -64,6 +79,8 @@ export function ImageGallery({ images, alt }: ImageGalleryProps) {
             <button
               key={index}
               onClick={() => setSelectedIndex(index)}
+              aria-label={`View image ${index + 1} of ${safeImages.length}`}
+              aria-current={selectedIndex === index ? 'true' : undefined}
               className={clsx(
                 'relative w-24 h-16 rounded-lg overflow-hidden shrink-0 transition-all duration-200',
                 selectedIndex === index

@@ -1,3 +1,17 @@
+import type {
+  User,
+  Booking, CreateBookingDto,
+  Hotel, Flight, Activity, CarRental,
+  PaymentResult,
+  Review, ReviewsResponse, CreateReviewDto,
+  Notification as TsaNotification, NotificationsResponse,
+  Favorite,
+  PromoCode, Campaign, LoyaltyTransaction, Recommendation,
+} from '@shared/types';
+import type {
+  AuthResponse, MessageResponse, AdminDashboardStats, LoyaltyBalance, PromoValidationResult, PaginatedResponse,
+} from '@shared/types/api';
+
 // Use relative URLs in the browser (goes through Next.js rewrite proxy, avoids CORS)
 // Use absolute URL only on the server side (SSR)
 const API_URL =
@@ -74,35 +88,35 @@ class ApiClient {
 
   // Auth
   login(email: string, password: string) {
-    return this.request<{ accessToken: string; refreshToken: string; user: any }>('/auth/login', {
+    return this.request<AuthResponse>('/auth/login', {
       method: 'POST',
       body: JSON.stringify({ email, password }),
     });
   }
 
   register(data: { email: string; password: string; firstName: string; lastName: string }) {
-    return this.request<{ accessToken: string; refreshToken: string; user: any }>('/auth/register', {
+    return this.request<AuthResponse>('/auth/register', {
       method: 'POST',
       body: JSON.stringify(data),
     });
   }
 
   forgotPassword(email: string) {
-    return this.request<{ message: string }>('/auth/forgot-password', {
+    return this.request<MessageResponse>('/auth/forgot-password', {
       method: 'POST',
       body: JSON.stringify({ email }),
     });
   }
 
   resetPassword(token: string, password: string) {
-    return this.request<{ message: string }>('/auth/reset-password', {
+    return this.request<MessageResponse>('/auth/reset-password', {
       method: 'POST',
       body: JSON.stringify({ token, password }),
     });
   }
 
   logout() {
-    return this.request('/auth/logout', { method: 'POST' }).finally(() => {
+    return this.request<void>('/auth/logout', { method: 'POST' }).finally(() => {
       this.setToken(null);
       if (typeof window !== 'undefined') {
         localStorage.removeItem('refreshToken');
@@ -112,184 +126,184 @@ class ApiClient {
 
   // User
   getProfile() {
-    return this.request<any>('/users/me');
+    return this.request<User>('/users/me');
   }
 
-  updateProfile(data: any) {
-    return this.request<any>('/users/me', { method: 'PUT', body: JSON.stringify(data) });
+  updateProfile(data: Partial<Pick<User, 'firstName' | 'lastName' | 'phone' | 'preferredCurrency' | 'preferredLanguage'>>) {
+    return this.request<User>('/users/me', { method: 'PUT', body: JSON.stringify(data) });
   }
 
-  // Search
+  // Search — Hotels
   searchHotels(params: Record<string, string>) {
     const qs = new URLSearchParams(params).toString();
-    return this.request<any>(`/suppliers/hotels/search?${qs}`);
+    return this.request<{ results: Hotel[]; total: number }>(`/suppliers/hotels/search?${qs}`);
   }
 
   getHotel(id: string) {
-    return this.request<any>(`/suppliers/hotels/${id}`);
+    return this.request<Hotel>(`/suppliers/hotels/${id}`);
   }
 
   searchES(params: Record<string, string>) {
     const qs = new URLSearchParams(params).toString();
-    return this.request<any>(`/search/hotels?${qs}`);
+    return this.request<{ results: Hotel[]; total: number }>(`/search/hotels?${qs}`);
   }
 
   // Bookings
-  createBooking(data: any) {
-    return this.request<any>('/bookings', { method: 'POST', body: JSON.stringify(data) });
+  createBooking(data: CreateBookingDto) {
+    return this.request<Booking>('/bookings', { method: 'POST', body: JSON.stringify(data) });
   }
 
   getMyBookings(page = 1) {
-    return this.request<any>(`/bookings/my?page=${page}`);
+    return this.request<{ bookings: Booking[]; total: number; page: number; limit: number }>(`/bookings/my?page=${page}`);
   }
 
   getBooking(id: string) {
-    return this.request<any>(`/bookings/${id}`);
+    return this.request<Booking>(`/bookings/${id}`);
   }
 
   cancelBooking(id: string) {
-    return this.request<any>(`/bookings/${id}/cancel`, { method: 'PUT' });
+    return this.request<Booking>(`/bookings/${id}/cancel`, { method: 'PUT' });
   }
 
   // Payments
   createPaymentIntent(data: { bookingId: string; amount: number; currency: string }) {
-    return this.request<any>('/payments/create-intent', { method: 'POST', body: JSON.stringify(data) });
+    return this.request<PaymentResult>('/payments/create-intent', { method: 'POST', body: JSON.stringify(data) });
   }
 
   // Loyalty
   getLoyaltyBalance() {
-    return this.request<any>('/loyalty/balance');
+    return this.request<LoyaltyBalance>('/loyalty/balance');
   }
 
   getLoyaltyHistory(page = 1) {
-    return this.request<any>(`/loyalty/history?page=${page}`);
+    return this.request<PaginatedResponse<LoyaltyTransaction>>(`/loyalty/history?page=${page}`);
   }
 
   // Marketing
   validatePromo(code: string, amount: number) {
-    return this.request<any>('/marketing/promo/validate', {
+    return this.request<PromoValidationResult>('/marketing/promo/validate', {
       method: 'POST',
       body: JSON.stringify({ code, amount }),
     });
   }
 
   getRecommendations() {
-    return this.request<any>('/marketing/recommendations');
+    return this.request<Recommendation[]>('/marketing/recommendations');
   }
 
   // Flights
   searchFlights(params: Record<string, string>) {
     const qs = new URLSearchParams(params).toString();
-    return this.request<any>(`/suppliers/flights/search?${qs}`);
+    return this.request<{ results: Flight[]; total: number }>(`/suppliers/flights/search?${qs}`);
   }
 
   getFlight(id: string) {
-    return this.request<any>(`/suppliers/flights/${id}`);
+    return this.request<Flight>(`/suppliers/flights/${id}`);
   }
 
   // Activities
   searchActivities(params: Record<string, string>) {
     const qs = new URLSearchParams(params).toString();
-    return this.request<any>(`/suppliers/activities/search?${qs}`);
+    return this.request<{ results: Activity[]; total: number }>(`/suppliers/activities/search?${qs}`);
   }
 
   getActivity(id: string) {
-    return this.request<any>(`/suppliers/activities/${id}`);
+    return this.request<Activity>(`/suppliers/activities/${id}`);
   }
 
   // Cars
   searchCars(params: Record<string, string>) {
     const qs = new URLSearchParams(params).toString();
-    return this.request<any>(`/suppliers/cars/search?${qs}`);
+    return this.request<{ results: CarRental[]; total: number }>(`/suppliers/cars/search?${qs}`);
   }
 
   getCar(id: string) {
-    return this.request<any>(`/suppliers/cars/${id}`);
+    return this.request<CarRental>(`/suppliers/cars/${id}`);
   }
 
   // Reviews
   getProductReviews(productType: string, productId: string, page = 1, limit = 10) {
-    return this.request<any>(`/reviews/product/${productType}/${productId}?page=${page}&limit=${limit}`);
+    return this.request<ReviewsResponse>(`/reviews/product/${productType}/${productId}?page=${page}&limit=${limit}`);
   }
 
-  createReview(data: { productType: string; productId: string; rating: number; title: string; comment: string; images?: string[] }) {
-    return this.request<any>('/reviews', { method: 'POST', body: JSON.stringify(data) });
+  createReview(data: CreateReviewDto) {
+    return this.request<Review>('/reviews', { method: 'POST', body: JSON.stringify(data) });
   }
 
   markReviewHelpful(reviewId: string) {
-    return this.request<any>(`/reviews/${reviewId}/helpful`, { method: 'PATCH' });
+    return this.request<Review>(`/reviews/${reviewId}/helpful`, { method: 'PATCH' });
   }
 
   getMyReviews(page = 1) {
-    return this.request<any>(`/reviews/my?page=${page}`);
+    return this.request<PaginatedResponse<Review>>(`/reviews/my?page=${page}`);
   }
 
   // Favorites
   getFavorites(type?: string) {
     const qs = type ? `?type=${type}` : '';
-    return this.request<any>(`/favorites${qs}`);
+    return this.request<Favorite[]>(`/favorites${qs}`);
   }
 
   addFavorite(productType: string, productId: string) {
-    return this.request<any>('/favorites', { method: 'POST', body: JSON.stringify({ productType, productId }) });
+    return this.request<Favorite>('/favorites', { method: 'POST', body: JSON.stringify({ productType, productId }) });
   }
 
   removeFavorite(productType: string, productId: string) {
-    return this.request<any>(`/favorites/${productType}/${productId}`, { method: 'DELETE' });
+    return this.request<void>(`/favorites/${productType}/${productId}`, { method: 'DELETE' });
   }
 
   checkFavorite(productType: string, productId: string) {
-    return this.request<any>(`/favorites/check/${productType}/${productId}`);
+    return this.request<{ isFavorited: boolean }>(`/favorites/check/${productType}/${productId}`);
   }
 
   // Notifications
   getNotifications(page = 1) {
-    return this.request<any>(`/notifications?page=${page}`);
+    return this.request<NotificationsResponse>(`/notifications?page=${page}`);
   }
 
   getUnreadCount() {
-    return this.request<any>('/notifications/unread-count');
+    return this.request<{ count: number }>('/notifications/unread-count');
   }
 
   markNotificationRead(id: string) {
-    return this.request<any>(`/notifications/${id}/read`, { method: 'PATCH' });
+    return this.request<TsaNotification>(`/notifications/${id}/read`, { method: 'PATCH' });
   }
 
   markAllNotificationsRead() {
-    return this.request<any>('/notifications/read-all', { method: 'PATCH' });
+    return this.request<MessageResponse>('/notifications/read-all', { method: 'PATCH' });
   }
 
   // Admin
   getAdminStats() {
-    return this.request<any>('/admin/dashboard');
+    return this.request<AdminDashboardStats>('/admin/dashboard');
   }
 
   getAdminUsers() {
-    return this.request<any>('/admin/users');
+    return this.request<User[]>('/admin/users');
   }
 
   getAdminBookings(limit = 20) {
-    return this.request<any>(`/admin/bookings?limit=${limit}`);
+    return this.request<{ bookings: Booking[]; total: number }>(`/admin/bookings?limit=${limit}`);
   }
 
   getAdminPromos() {
-    return this.request<any>('/admin/promos');
+    return this.request<PromoCode[]>('/admin/promos');
   }
 
-  createAdminPromo(data: any) {
-    return this.request<any>('/admin/promos', { method: 'POST', body: JSON.stringify(data) });
+  createAdminPromo(data: Partial<PromoCode>) {
+    return this.request<PromoCode>('/admin/promos', { method: 'POST', body: JSON.stringify(data) });
   }
 
   getAdminCampaigns() {
-    return this.request<any>('/admin/campaigns');
+    return this.request<Campaign[]>('/admin/campaigns');
   }
 
-  createAdminCampaign(data: any) {
-    return this.request<any>('/admin/campaigns', { method: 'POST', body: JSON.stringify(data) });
+  createAdminCampaign(data: Partial<Campaign>) {
+    return this.request<Campaign>('/admin/campaigns', { method: 'POST', body: JSON.stringify(data) });
   }
 
   sendCampaign(id: string) {
-    return this.request<any>(`/admin/campaigns/${id}/send`, { method: 'PUT' });
+    return this.request<Campaign>(`/admin/campaigns/${id}/send`, { method: 'PUT' });
   }
 }
 

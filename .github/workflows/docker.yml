@@ -1,0 +1,23 @@
+name: Docker Build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  docker-validate:
+    name: Validate Docker Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build backend image
+        run: docker build -f Dockerfile.backend -t tsa-backend:test .
+
+      - name: Build web image
+        run: docker build -f Dockerfile.web -t tsa-web:test .
+
+      - name: Verify compose config
+        run: docker compose config --quiet

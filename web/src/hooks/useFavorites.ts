@@ -3,11 +3,12 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { api } from '@/lib/api';
 import { useAuth } from '@/hooks/useAuth';
+import type { Favorite } from '@shared/types';
 
 interface FavoritesContextType {
   isFavorited: (productType: string, productId: string) => boolean;
   toggleFavorite: (productType: string, productId: string) => Promise<void>;
-  favorites: any[];
+  favorites: Favorite[];
   favoritesCount: number;
   loading: boolean;
 }
@@ -31,7 +32,7 @@ function makeKey(type: string, id: string) {
 export function useFavoritesProvider(): FavoritesContextType {
   const { user } = useAuth();
   const [favSet, setFavSet] = useState<Set<string>>(new Set());
-  const [favorites, setFavorites] = useState<any[]>([]);
+  const [favorites, setFavorites] = useState<Favorite[]>([]);
   const [loading, setLoading] = useState(false);
 
   // Load favorites on auth change
@@ -39,9 +40,9 @@ export function useFavoritesProvider(): FavoritesContextType {
     if (user) {
       setLoading(true);
       api.getFavorites()
-        .then((data: any[]) => {
+        .then((data: Favorite[]) => {
           const set = new Set<string>();
-          (data || []).forEach((f: any) => set.add(makeKey(f.productType, f.productId)));
+          (data || []).forEach((f: Favorite) => set.add(makeKey(f.productType, f.productId)));
           setFavSet(set);
           setFavorites(data || []);
         })
@@ -53,7 +54,7 @@ export function useFavoritesProvider(): FavoritesContextType {
         try {
           const stored = JSON.parse(localStorage.getItem('tsa-favorites') || '[]');
           const set = new Set<string>();
-          stored.forEach((f: any) => set.add(makeKey(f.productType, f.productId)));
+          stored.forEach((f: Favorite) => set.add(makeKey(f.productType, f.productId)));
           setFavSet(set);
           setFavorites(stored);
         } catch {
@@ -104,7 +105,7 @@ export function useFavoritesProvider(): FavoritesContextType {
         const stored = JSON.parse(localStorage.getItem('tsa-favorites') || '[]');
         let updated;
         if (wasFavorited) {
-          updated = stored.filter((f: any) => !(f.productType === productType && f.productId === productId));
+          updated = stored.filter((f: Favorite) => !(f.productType === productType && f.productId === productId));
         } else {
           updated = [{ productType, productId, createdAt: new Date().toISOString() }, ...stored];
         }

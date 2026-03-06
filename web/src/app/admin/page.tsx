@@ -84,15 +84,15 @@ export default function AdminDashboard() {
       }).catch(() => {});
     } else if (activeTab === "users") {
       api.getAdminUsers().then((data) => {
-        setUsers(Array.isArray(data) ? data : data.users || []);
+        setUsers(Array.isArray(data) ? data : []);
       }).catch(() => toast.error("Failed to load users"));
     } else if (activeTab === "promos") {
       api.getAdminPromos().then((data) => {
-        setPromos(Array.isArray(data) ? data : data.promos || []);
+        setPromos(Array.isArray(data) ? data : []);
       }).catch(() => toast.error("Failed to load promos"));
     } else if (activeTab === "campaigns") {
       api.getAdminCampaigns().then((data) => {
-        setCampaigns(Array.isArray(data) ? data : data.campaigns || []);
+        setCampaigns(Array.isArray(data) ? data : []);
       }).catch(() => toast.error("Failed to load campaigns"));
     }
   }, [activeTab, user]);
@@ -117,7 +117,7 @@ export default function AdminDashboard() {
       await api.createAdminPromo(promoForm);
       toast.success("Promo code created");
       setPromoForm({ code: "", discountType: "percentage", discountValue: 10, maxUses: 100, validFrom: "", validUntil: "" });
-      api.getAdminPromos().then((data) => setPromos(Array.isArray(data) ? data : data.promos || [])).catch(() => {});
+      api.getAdminPromos().then((data) => setPromos(Array.isArray(data) ? data : [])).catch(() => {});
     } catch {
       toast.error("Failed to create promo");
     }
@@ -132,7 +132,7 @@ export default function AdminDashboard() {
       await api.createAdminCampaign(campaignForm);
       toast.success("Campaign created");
       setCampaignForm({ name: "", subject: "", template: "promotional", target: "all_users", scheduledDate: "" });
-      api.getAdminCampaigns().then((data) => setCampaigns(Array.isArray(data) ? data : data.campaigns || [])).catch(() => {});
+      api.getAdminCampaigns().then((data) => setCampaigns(Array.isArray(data) ? data : [])).catch(() => {});
     } catch {
       toast.error("Failed to create campaign");
     }
@@ -142,7 +142,7 @@ export default function AdminDashboard() {
     try {
       await api.sendCampaign(id);
       toast.success("Campaign sent");
-      api.getAdminCampaigns().then((data) => setCampaigns(Array.isArray(data) ? data : data.campaigns || [])).catch(() => {});
+      api.getAdminCampaigns().then((data) => setCampaigns(Array.isArray(data) ? data : [])).catch(() => {});
     } catch {
       toast.error("Failed to send campaign");
     }

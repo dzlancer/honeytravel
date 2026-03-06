@@ -3,8 +3,10 @@
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
+import { getErrorMessage } from '@/lib/errors';
 import { formatCurrency } from '@/lib/currency';
 import { useAuth } from '@/hooks/useAuth';
+import type { Room } from '@shared/types';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -88,8 +90,8 @@ export default function HotelDetailPage() {
         guestDetails: [{ firstName: user.firstName, lastName: user.lastName }],
       });
       router.push(`/checkout/${booking.id}`);
-    } catch (error: any) {
-      toast.error(error.message || 'Failed to create booking');
+    } catch (error: unknown) {
+      toast.error(getErrorMessage(error));
     }
   };
 
@@ -184,7 +186,7 @@ export default function HotelDetailPage() {
               <section>
                 <h2 className="text-heading-md font-semibold mb-4">{t('hotel.rooms')}</h2>
                 <div className="space-y-3">
-                  {rooms.map((room: any) => (
+                  {rooms.map((room: Room) => (
                     <div
                       key={room.id}
                       onClick={() => setSelectedRoom(room)}

@@ -61,7 +61,7 @@ export function Header() {
             <Logo size="md" />
 
             {/* Desktop Navigation */}
-            <nav className="hidden lg:flex items-center gap-1">
+            <nav aria-label="Main navigation" className="hidden lg:flex items-center gap-1">
               {NAV_LINKS.map((link) => (
                 <Link
                   key={link.key}
@@ -170,6 +170,7 @@ export function Header() {
               className="lg:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors"
               onClick={() => setMobileOpen(!mobileOpen)}
               aria-label="Toggle menu"
+              aria-expanded={mobileOpen}
             >
               <svg className="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 {mobileOpen ? (

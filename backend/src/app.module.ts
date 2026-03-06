@@ -15,6 +15,7 @@ import { LoyaltyModule } from './modules/loyalty/loyalty.module';
 import { AdminModule } from './modules/admin/admin.module';
 import { ReviewsModule } from './modules/reviews/reviews.module';
 import { FavoritesModule } from './modules/favorites/favorites.module';
+import { HealthModule } from './modules/health/health.module';
 
 @Module({
   imports: [
@@ -66,6 +67,7 @@ import { FavoritesModule } from './modules/favorites/favorites.module';
     AdminModule,
     ReviewsModule,
     FavoritesModule,
+    HealthModule,
   ],
 })
 export class AppModule {}
