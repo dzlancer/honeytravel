@@ -258,3 +258,87 @@ export interface CarSearchCriteria {
   page?: number;
   limit?: number;
 }
+
+// ─── Tour Types ──────────────────────────────────────────
+
+export interface TourItineraryDay {
+  day: number;
+  title: string;
+  description: string;
+  meals?: { breakfast: boolean; lunch: boolean; dinner: boolean };
+  accommodation?: string;
+  locations?: string[];
+}
+
+export interface TourAccommodation {
+  name: string;
+  type: string;
+  starRating?: number;
+  city: string;
+  nights: number;
+}
+
+export interface Tour {
+  id: string;
+  supplierId: string;
+  supplierTourId: string;
+  name: string;
+  description: string;
+  highlights: string[];
+  destination: { city: string; country: string };
+  location: GeoLocation;
+  duration: string;
+  durationDays: number;
+  durationNights: number;
+  tourStyle: string;
+  groupSize: { min: number; max: number };
+  difficulty: 'easy' | 'moderate' | 'challenging';
+  itinerary: TourItineraryDay[];
+  includes: string[];
+  excludes: string[];
+  accommodations: TourAccommodation[];
+  images: string[];
+  price: number;
+  priceChild?: number;
+  currency: string;
+  availableDates: string[];
+  cancellationPolicy: string;
+  childPolicy?: string;
+  avgRating: number;
+  reviewCount: number;
+  guideLanguages?: string[];
+}
+
+export interface TourSearchCriteria {
+  destination: string;
+  startDate?: string;
+  endDate?: string;
+  tourStyle?: string;
+  minDuration?: number;
+  maxDuration?: number;
+  difficulty?: string;
+  minPrice?: number;
+  maxPrice?: number;
+  groupSize?: number;
+  sortBy?: 'price' | 'rating' | 'duration';
+  sortOrder?: 'asc' | 'desc';
+  page?: number;
+  limit?: number;
+}
+
+export interface TourCalculationRequest {
+  tourId: string;
+  date: string;
+  adults: number;
+  children?: number;
+  childAges?: number[];
+}
+
+export interface TourCalculationResponse {
+  available: boolean;
+  totalPrice: number;
+  pricePerAdult: number;
+  pricePerChild?: number;
+  currency: string;
+  supplements?: { name: string; price: number }[];
+}

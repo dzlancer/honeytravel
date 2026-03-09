@@ -28,10 +28,10 @@ export class PromoCode {
   @Column({ default: 0 })
   usedCount: number;
 
-  @Column({ type: 'timestamptz' })
+  @Column({ type: 'datetime' })
   validFrom: Date;
 
-  @Column({ type: 'timestamptz' })
+  @Column({ type: 'datetime' })
   validUntil: Date;
 
   @Column({ default: true })

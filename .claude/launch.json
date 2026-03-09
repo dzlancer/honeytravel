@@ -2,22 +2,11 @@
   "version": "0.0.1",
   "configurations": [
     {
-      "name": "backend",
-      "runtimeExecutable": "cmd",
-      "runtimeArgs": ["/c", "npm run backend:dev"],
-      "port": 3001
-    },
-    {
       "name": "web",
-      "runtimeExecutable": "cmd",
-      "runtimeArgs": ["/c", "npm run web:dev"],
-      "port": 3000
-    },
-    {
-      "name": "mobile",
-      "runtimeExecutable": "cmd",
-      "runtimeArgs": ["/c", "npm run start --workspace=mobile"],
-      "port": 8081
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["node_modules/next/dist/bin/next", "dev", "-p", "3002"],
+      "port": 3002,
+      "cwd": "web"
     }
   ]
 }

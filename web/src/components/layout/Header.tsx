@@ -13,6 +13,7 @@ import clsx from 'clsx';
 const NAV_LINKS = [
   { key: 'hotels', href: '/search' },
   { key: 'flights', href: '/search?type=flights' },
+  { key: 'tours', href: '/search?type=tours' },
   { key: 'activities', href: '/search?type=activities' },
   { key: 'carRentals', href: '/search?type=cars' },
 ] as const;
@@ -125,7 +126,7 @@ export function Header() {
                             {item.label}
                           </Link>
                         ))}
-                        {user.role === 'admin' && (
+                        {['admin', 'super_admin'].includes(user.role) && (
                           <Link href="/admin"
                             className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50"
                             onClick={() => setProfileOpen(false)}>

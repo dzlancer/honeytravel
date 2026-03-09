@@ -13,6 +13,7 @@ export const ProductType = {
   ACTIVITY: 'activity',
   PACKAGE: 'package',
   CAR_RENTAL: 'car_rental',
+  TOUR: 'tour',
 } as const;
 export type ProductType = (typeof ProductType)[keyof typeof ProductType];
 
@@ -43,6 +44,10 @@ export interface GuestDetail {
   lastName: string;
   email?: string;
   phone?: string;
+  dateOfBirth?: string;
+  passportNumber?: string;
+  passportExpiry?: string;
+  nationality?: string;
 }
 
 export interface CreateBookingDto {
@@ -57,4 +62,6 @@ export interface CreateBookingDto {
   currency: string;
   loyaltyPointsToUse?: number;
   promoCode?: string;
+  tourDate?: string;
+  childAges?: number[];
 }

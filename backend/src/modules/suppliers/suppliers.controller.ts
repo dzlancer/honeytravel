@@ -222,4 +222,80 @@ export class SuppliersController {
   async getCar(@Param('id') id: string) {
     return this.suppliersService.getCarById(id);
   }
+
+  // ─── Tours ──────────────────────────────────────────────
+
+  @Public()
+  @Get('tours/search')
+  @ApiOperation({ summary: 'Search tours across all suppliers' })
+  @ApiQuery({ name: 'destination', required: false })
+  @ApiQuery({ name: 'startDate', required: false })
+  @ApiQuery({ name: 'endDate', required: false })
+  @ApiQuery({ name: 'tourStyle', required: false })
+  @ApiQuery({ name: 'minDuration', required: false })
+  @ApiQuery({ name: 'maxDuration', required: false })
+  @ApiQuery({ name: 'difficulty', required: false })
+  @ApiQuery({ name: 'minPrice', required: false })
+  @ApiQuery({ name: 'maxPrice', required: false })
+  @ApiQuery({ name: 'groupSize', required: false })
+  @ApiQuery({ name: 'sortBy', required: false })
+  @ApiQuery({ name: 'sortOrder', required: false })
+  @ApiQuery({ name: 'page', required: false })
+  @ApiQuery({ name: 'limit', required: false })
+  async searchTours(
+    @Query('destination') destination?: string,
+    @Query('startDate') startDate?: string,
+    @Query('endDate') endDate?: string,
+    @Query('tourStyle') tourStyle?: string,
+    @Query('minDuration') minDuration?: number,
+    @Query('maxDuration') maxDuration?: number,
+    @Query('difficulty') difficulty?: string,
+    @Query('minPrice') minPrice?: number,
+    @Query('maxPrice') maxPrice?: number,
+    @Query('groupSize') groupSize?: number,
+    @Query('sortBy') sortBy?: string,
+    @Query('sortOrder') sortOrder?: string,
+    @Query('page') page?: number,
+    @Query('limit') limit?: number,
+  ) {
+    return this.suppliersService.searchTours({
+      destination: destination || '',
+      startDate,
+      endDate,
+      tourStyle,
+      minDuration: minDuration ? Number(minDuration) : undefined,
+      maxDuration: maxDuration ? Number(maxDuration) : undefined,
+      difficulty,
+      minPrice: minPrice ? Number(minPrice) : undefined,
+      maxPrice: maxPrice ? Number(maxPrice) : undefined,
+      groupSize: groupSize ? Number(groupSize) : undefined,
+      sortBy: sortBy as 'price' | 'rating' | 'duration',
+      sortOrder: sortOrder as 'asc' | 'desc',
+      page: page ? Number(page) : undefined,
+      limit: limit ? Number(limit) : undefined,
+    });
+  }
+
+  @Public()
+  @Get('tours/:id')
+  @ApiOperation({ summary: 'Get tour details' })
+  async getTour(@Param('id') id: string) {
+    return this.suppliersService.getTourById(id);
+  }
+
+  @Public()
+  @Post('tours/:id/calculate')
+  @ApiOperation({ summary: 'Calculate tour price' })
+  async calculateTourPrice(
+    @Param('id') id: string,
+    @Body() body: { date: string; adults: number; children?: number; childAges?: number[] },
+  ) {
+    return this.suppliersService.calculateTourPrice({
+      tourId: id,
+      date: body.date,
+      adults: body.adults,
+      children: body.children,
+      childAges: body.childAges,
+    });
+  }
 }

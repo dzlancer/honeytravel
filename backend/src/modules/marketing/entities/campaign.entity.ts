@@ -26,13 +26,13 @@ export class Campaign {
   @Column({ default: 'all' })
   targetAudience: string; // all, active, inactive, loyal
 
-  @Column({ type: 'timestamptz', nullable: true })
+  @Column({ type: 'datetime', nullable: true })
   scheduledAt: Date;
 
-  @Column({ type: 'timestamptz', nullable: true })
+  @Column({ type: 'datetime', nullable: true })
   sentAt: Date;
 
-  @Column({ type: 'enum', enum: CampaignStatus, default: CampaignStatus.DRAFT })
+  @Column({ type: 'text', default: CampaignStatus.DRAFT })
   status: CampaignStatus;
 
   @Column({ type: 'decimal', precision: 5, scale: 2, nullable: true })

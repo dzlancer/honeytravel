@@ -20,6 +20,7 @@ export enum ProductType {
   ACTIVITY = 'activity',
   PACKAGE = 'package',
   CAR_RENTAL = 'car_rental',
+  TOUR = 'tour',
 }
 
 @Entity('bookings')
@@ -36,7 +37,7 @@ export class Booking {
   @JoinColumn({ name: 'userId' })
   user: User;
 
-  @Column({ type: 'enum', enum: ProductType })
+  @Column({ type: 'text' })
   productType: ProductType;
 
   @Column()
@@ -48,7 +49,7 @@ export class Booking {
   @Column({ nullable: true })
   supplierBookingRef: string;
 
-  @Column({ type: 'enum', enum: BookingStatus, default: BookingStatus.PENDING })
+  @Column({ type: 'text', default: BookingStatus.PENDING })
   status: BookingStatus;
 
   @Column({ type: 'date' })
@@ -78,7 +79,7 @@ export class Booking {
   @Column({ type: 'decimal', precision: 12, scale: 2, default: 0 })
   discountAmount: number;
 
-  @Column({ type: 'jsonb', nullable: true })
+  @Column({ type: 'simple-json', nullable: true })
   guestDetails: { firstName: string; lastName: string; email?: string; phone?: string }[];
 
   @Column({ nullable: true })

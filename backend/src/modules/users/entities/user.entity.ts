@@ -10,6 +10,7 @@ import { Favorite } from '../../favorites/entities/favorite.entity';
 export enum UserRole {
   CUSTOMER = 'customer',
   ADMIN = 'admin',
+  SUPER_ADMIN = 'super_admin',
   SUPPLIER_MANAGER = 'supplier_manager',
 }
 
@@ -37,7 +38,7 @@ export class User {
   @Column({ nullable: true })
   avatarUrl: string;
 
-  @Column({ type: 'enum', enum: UserRole, default: UserRole.CUSTOMER })
+  @Column({ type: 'text', default: UserRole.CUSTOMER })
   role: UserRole;
 
   @Column({ default: 'USD' })
@@ -58,7 +59,7 @@ export class User {
   @Column({ nullable: true })
   passwordResetToken: string;
 
-  @Column({ nullable: true, type: 'timestamptz' })
+  @Column({ nullable: true, type: 'datetime' })
   passwordResetExpires: Date;
 
   @OneToMany(() => Booking, (booking) => booking.user)

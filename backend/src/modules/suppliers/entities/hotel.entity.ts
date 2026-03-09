@@ -22,7 +22,7 @@ export class Hotel {
   @Column({ type: 'text' })
   description: string;
 
-  @Column({ type: 'smallint', default: 3 })
+  @Column({ type: 'integer', default: 3 })
   starRating: number;
 
   @Column()
@@ -46,13 +46,13 @@ export class Hotel {
   @Column({ type: 'decimal', precision: 10, scale: 7 })
   lng: number;
 
-  @Column({ type: 'jsonb', default: [] })
+  @Column({ type: 'simple-json', default: '[]' })
   images: string[];
 
-  @Column({ type: 'jsonb', default: [] })
+  @Column({ type: 'simple-json', default: '[]' })
   amenities: string[];
 
-  @Column({ type: 'jsonb', default: [] })
+  @Column({ type: 'simple-json', default: '[]' })
   rooms: {
     id: string;
     name: string;
@@ -65,7 +65,7 @@ export class Hotel {
     currency: string;
   }[];
 
-  @Column({ type: 'jsonb', nullable: true })
+  @Column({ type: 'simple-json', nullable: true })
   policies: {
     checkInTime: string;
     checkOutTime: string;

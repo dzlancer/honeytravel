@@ -113,16 +113,47 @@ export default function CheckoutPage() {
                   <h2 className="font-semibold text-lg">{t('checkout.step1')}</h2>
                 </div>
                 {booking.guestDetails?.map((guest: any, i: number) => (
-                  <div key={i} className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
-                    <div className="w-10 h-10 bg-primary-100 rounded-full flex items-center justify-center">
-                      <span className="text-primary-700 font-semibold text-sm">
-                        {guest.firstName?.[0]}{guest.lastName?.[0]}
-                      </span>
+                  <div key={i} className="p-3 bg-gray-50 rounded-xl space-y-2">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-primary-100 rounded-full flex items-center justify-center">
+                        <span className="text-primary-700 font-semibold text-sm">
+                          {guest.firstName?.[0]}{guest.lastName?.[0]}
+                        </span>
+                      </div>
+                      <div>
+                        <p className="font-medium text-gray-900">{guest.firstName} {guest.lastName}</p>
+                        <p className="text-xs text-gray-500">{t('common.guest')} {i + 1}</p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="font-medium text-gray-900">{guest.firstName} {guest.lastName}</p>
-                      <p className="text-xs text-gray-500">{t('common.guest')} {i + 1}</p>
-                    </div>
+                    {/* Tour-specific traveler details */}
+                    {booking.productType === 'tour' && (
+                      <div className="grid grid-cols-2 gap-2 pt-2 border-t border-gray-200 text-xs">
+                        {guest.dateOfBirth && (
+                          <div>
+                            <span className="text-gray-400">{t('tour.dateOfBirth', 'Date of Birth')}</span>
+                            <p className="text-gray-700">{guest.dateOfBirth}</p>
+                          </div>
+                        )}
+                        {guest.nationality && (
+                          <div>
+                            <span className="text-gray-400">{t('tour.nationality', 'Nationality')}</span>
+                            <p className="text-gray-700">{guest.nationality}</p>
+                          </div>
+                        )}
+                        {guest.passportNumber && (
+                          <div>
+                            <span className="text-gray-400">{t('tour.passport', 'Passport')}</span>
+                            <p className="text-gray-700">{guest.passportNumber}</p>
+                          </div>
+                        )}
+                        {guest.passportExpiry && (
+                          <div>
+                            <span className="text-gray-400">{t('tour.passportExpiry', 'Passport Expiry')}</span>
+                            <p className="text-gray-700">{guest.passportExpiry}</p>
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>

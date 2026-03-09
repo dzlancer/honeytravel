@@ -3,14 +3,15 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
-import { Plane, Compass, Car, Hotel, Search } from 'lucide-react';
+import { Plane, Compass, Car, Hotel, Search, Map } from 'lucide-react';
 import clsx from 'clsx';
 
-const TABS = ['hotels', 'flights', 'activities', 'carRentals'] as const;
+const TABS = ['hotels', 'flights', 'tours', 'activities', 'carRentals'] as const;
 
 const TAB_ICONS: Record<string, React.ElementType> = {
   hotels: Hotel,
   flights: Plane,
+  tours: Map,
   activities: Compass,
   carRentals: Car,
 };
@@ -32,6 +33,10 @@ export function SearchHero() {
   const [returnDate, setReturnDate] = useState('');
   const [passengers, setPassengers] = useState(1);
   const [cabinClass, setCabinClass] = useState('economy');
+
+  // Tour fields
+  const [tourStartDate, setTourStartDate] = useState('');
+  const [tourTravelers, setTourTravelers] = useState(2);
 
   // Activity fields
   const [groupSize, setGroupSize] = useState(2);
@@ -58,6 +63,11 @@ export function SearchHero() {
       params.set('passengers', String(passengers));
       params.set('cabinClass', cabinClass);
       params.set('type', 'flights');
+    } else if (activeTab === 'tours') {
+      if (destination) params.set('destination', destination);
+      if (tourStartDate) params.set('startDate', tourStartDate);
+      params.set('groupSize', String(tourTravelers));
+      params.set('type', 'tours');
     } else if (activeTab === 'activities') {
       if (destination) params.set('destination', destination);
       if (checkIn) params.set('date', checkIn);
@@ -180,6 +190,48 @@ export function SearchHero() {
             <Search className="w-5 h-5" />
           </button>
         </div>
+      </div>
+    </div>
+  );
+
+  const renderTourFields = () => (
+    <div className="grid grid-cols-1 md:grid-cols-4 gap-3 md:gap-4">
+      <div>
+        <label className="input-label">{t('common.destination')}</label>
+        <input
+          type="text"
+          value={destination}
+          onChange={(e) => setDestination(e.target.value)}
+          placeholder={t('tour.searchPlaceholder', 'Turkey, Cappadocia...')}
+          className="input-field text-gray-900"
+        />
+      </div>
+      <div>
+        <label className="input-label">{t('tour.startDate', 'Start Date')}</label>
+        <input
+          type="date"
+          value={tourStartDate}
+          onChange={(e) => setTourStartDate(e.target.value)}
+          className="input-field text-gray-900"
+        />
+      </div>
+      <div>
+        <label className="input-label">{t('tour.travelers', 'Travelers')}</label>
+        <select
+          value={tourTravelers}
+          onChange={(e) => setTourTravelers(Number(e.target.value))}
+          className="input-field text-gray-900"
+        >
+          {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => (
+            <option key={n} value={n}>{n} {t(n > 1 ? 'tour.travelers' : 'tour.traveler', n > 1 ? 'Travelers' : 'Traveler')}</option>
+          ))}
+        </select>
+      </div>
+      <div className="flex items-end">
+        <button type="submit" className="btn-primary w-full whitespace-nowrap px-6">
+          <Search className="w-5 h-5" />
+          <span>{t('common.search')}</span>
+        </button>
       </div>
     </div>
   );
@@ -314,6 +366,7 @@ export function SearchHero() {
             <form onSubmit={handleSearch} className="p-4 md:p-6">
               {activeTab === 'hotels' && renderHotelFields()}
               {activeTab === 'flights' && renderFlightFields()}
+              {activeTab === 'tours' && renderTourFields()}
               {activeTab === 'activities' && renderActivityFields()}
               {activeTab === 'carRentals' && renderCarFields()}
             </form>

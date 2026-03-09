@@ -16,6 +16,8 @@ import { AdminModule } from './modules/admin/admin.module';
 import { ReviewsModule } from './modules/reviews/reviews.module';
 import { FavoritesModule } from './modules/favorites/favorites.module';
 import { HealthModule } from './modules/health/health.module';
+import { SystemConfigModule } from './modules/system-config/system-config.module';
+import * as path from 'path';
 
 @Module({
   imports: [
@@ -23,21 +25,32 @@ import { HealthModule } from './modules/health/health.module';
 
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
-      useFactory: (config: ConfigService) => ({
-        type: 'postgres',
-        host: config.get('DB_HOST', 'localhost'),
-        port: config.get<number>('DB_PORT', 5432),
-        username: config.get('DB_USERNAME', 'tsa_user'),
-        password: config.get('DB_PASSWORD', 'tsa_password'),
-        database: config.get('DB_DATABASE', 'travel_shop_algeria'),
-        autoLoadEntities: true,
-        synchronize: config.get('NODE_ENV') === 'development',
-        logging: config.get('NODE_ENV') === 'development',
-        extra: {
-          max: 20,
-          idleTimeoutMillis: 30000,
-        },
-      }),
+      useFactory: (config: ConfigService) => {
+        const dbType = config.get('DB_TYPE', 'postgres');
+        if (dbType === 'sqlite') {
+          return {
+            type: 'better-sqlite3' as any,
+            database: path.join(__dirname, '..', 'dev.sqlite'),
+            autoLoadEntities: true,
+            synchronize: true,
+          };
+        }
+        return {
+          type: 'postgres',
+          host: config.get('DB_HOST', 'localhost'),
+          port: config.get<number>('DB_PORT', 5432),
+          username: config.get('DB_USERNAME', 'tsa_user'),
+          password: config.get('DB_PASSWORD', 'tsa_password'),
+          database: config.get('DB_DATABASE', 'travel_shop_algeria'),
+          autoLoadEntities: true,
+          synchronize: config.get('NODE_ENV') === 'development',
+          logging: config.get('NODE_ENV') === 'development',
+          extra: {
+            max: 20,
+            idleTimeoutMillis: 30000,
+          },
+        };
+      },
     }),
 
     BullModule.forRootAsync({
@@ -46,6 +59,14 @@ import { HealthModule } from './modules/health/health.module';
         redis: {
           host: config.get('REDIS_HOST', 'localhost'),
           port: config.get<number>('REDIS_PORT', 6379),
+          maxRetriesPerRequest: null,
+          enableOfflineQueue: false,
+          lazyConnect: true,
+          retryStrategy: (times: number) => {
+            if (times > 3) return null;          // stop retrying
+            return Math.min(times * 500, 3000);
+          },
+          reconnectOnError: () => false,
         },
       }),
     }),
@@ -68,6 +89,7 @@ import { HealthModule } from './modules/health/health.module';
     ReviewsModule,
     FavoritesModule,
     HealthModule,
+    SystemConfigModule,
   ],
 })
 export class AppModule {}

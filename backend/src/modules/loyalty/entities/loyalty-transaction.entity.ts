@@ -28,7 +28,7 @@ export class LoyaltyTransaction {
   @Column()
   points: number;
 
-  @Column({ type: 'enum', enum: LoyaltyTransactionType })
+  @Column({ type: 'text' })
   type: LoyaltyTransactionType;
 
   @Column()

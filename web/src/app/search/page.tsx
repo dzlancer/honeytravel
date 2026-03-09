@@ -11,7 +11,7 @@ import { motion } from 'framer-motion';
 import {
   SlidersHorizontal, X, SearchX, MapPin, Wifi, Car as CarIcon, UtensilsCrossed,
   Waves, Dumbbell, Sparkles, Check, Plane, Clock, Users, Compass, Star,
-  Fuel, Cog,
+  Fuel, Cog, Map, Calendar,
 } from 'lucide-react';
 import { PageTransition } from '@/components/ui/PageTransition';
 import { StarRating } from '@/components/ui/StarRating';
@@ -29,7 +29,7 @@ const AMENITY_ICONS: Record<string, any> = {
 
 const ITEMS_PER_PAGE = 10;
 
-type SearchType = 'hotels' | 'flights' | 'activities' | 'cars';
+type SearchType = 'hotels' | 'flights' | 'activities' | 'cars' | 'tours';
 
 function SearchContent() {
   const searchParams = useSearchParams();
@@ -56,6 +56,9 @@ function SearchContent() {
     // Car filters
     carCategory: '',
     transmission: '',
+    // Tour filters
+    tourStyle: '',
+    tourDuration: '',
   });
 
   const page = Number(searchParams.get('page')) || 1;
@@ -97,6 +100,15 @@ function SearchContent() {
       if (trans) params.transmission = trans;
       if (filters.carCategory) params.category = filters.carCategory;
       if (filters.transmission) params.transmission = filters.transmission;
+    } else if (type === 'tours') {
+      const dest = searchParams.get('destination');
+      if (dest) params.destination = dest;
+      const sd = searchParams.get('startDate');
+      if (sd) params.startDate = sd;
+      const gs = searchParams.get('groupSize');
+      if (gs) params.groupSize = gs;
+      if (filters.tourStyle) params.tourStyle = filters.tourStyle;
+      if (filters.tourDuration) params.minDuration = filters.tourDuration;
     } else {
       // Hotels
       const dest = searchParams.get('destination');
@@ -125,6 +137,8 @@ function SearchContent() {
       searchPromise = api.searchActivities(params);
     } else if (type === 'cars') {
       searchPromise = api.searchCars(params);
+    } else if (type === 'tours') {
+      searchPromise = api.searchTours(params);
     } else {
       searchPromise = api.searchHotels(params);
     }
@@ -157,12 +171,14 @@ function SearchContent() {
     setFilters({
       minPrice: '', maxPrice: '', starRating: [], sortBy: 'price',
       stops: '', activityCategories: [], difficulty: '', carCategory: '', transmission: '',
+      tourStyle: '', tourDuration: '',
     });
   };
 
   const hasActiveFilters = filters.minPrice || filters.maxPrice ||
     filters.starRating.length > 0 || filters.stops || filters.activityCategories.length > 0 ||
-    filters.difficulty || filters.carCategory || filters.transmission;
+    filters.difficulty || filters.carCategory || filters.transmission ||
+    filters.tourStyle || filters.tourDuration;
 
   const handlePageChange = (newPage: number) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -176,6 +192,7 @@ function SearchContent() {
   const typeLabel = type === 'flights' ? t('common.flights')
     : type === 'activities' ? t('common.activities')
     : type === 'cars' ? t('common.carRentals')
+    : type === 'tours' ? t('common.tours')
     : t('common.hotels');
 
   const destination = searchParams.get('destination') || searchParams.get('pickupLocation') || searchParams.get('origin');
@@ -373,6 +390,38 @@ function SearchContent() {
             >
               <option value="price">{t('search.priceLow')}</option>
               <option value="rating">{t('search.ratingHigh')}</option>
+            </select>
+          </div>
+        </>
+      )}
+
+      {/* Tours: Style + Duration + Sort */}
+      {type === 'tours' && (
+        <>
+          <div>
+            <label className="input-label">{t('tour.tourStyle', 'Tour Style')}</label>
+            <select
+              value={filters.tourStyle}
+              onChange={(e) => setFilters(prev => ({ ...prev, tourStyle: e.target.value }))}
+              className="input-field"
+            >
+              <option value="">{t('search.all', 'All')}</option>
+              <option value="cultural">{t('tour.styles.cultural', 'Cultural')}</option>
+              <option value="adventure">{t('tour.styles.adventure', 'Adventure')}</option>
+              <option value="beach">{t('tour.styles.beach', 'Beach')}</option>
+            </select>
+          </div>
+          <div>
+            <label className="input-label">{t('tour.duration', 'Duration')}</label>
+            <select
+              value={filters.tourDuration}
+              onChange={(e) => setFilters(prev => ({ ...prev, tourDuration: e.target.value }))}
+              className="input-field"
+            >
+              <option value="">{t('search.all', 'All')}</option>
+              <option value="3">{t('tour.shortTour', '1-3 Days')}</option>
+              <option value="5">{t('tour.mediumTour', '4-7 Days')}</option>
+              <option value="8">{t('tour.longTour', '8+ Days')}</option>
             </select>
           </div>
         </>
@@ -657,11 +706,74 @@ function SearchContent() {
     </motion.div>
   );
 
+  const renderTourCard = (tour: any) => (
+    <Link href={`/tours/${tour.id}`} key={tour.id}>
+      <motion.div variants={staggerItem}
+        className="bg-white rounded-2xl shadow-soft-md hover:shadow-soft-lg transition-all duration-300 overflow-hidden group">
+        <div className="relative h-48 overflow-hidden">
+          <Image
+            src={tour.images?.[0] || '/placeholder-hotel.jpg'}
+            alt={tour.name}
+            fill
+            className="object-cover group-hover:scale-105 transition-transform duration-500"
+          />
+          <div className="absolute top-3 left-3 rtl:left-auto rtl:right-3 flex gap-2">
+            <span className="px-2.5 py-1 bg-white/90 backdrop-blur-sm rounded-lg text-xs font-medium text-gray-700">
+              {tour.duration}
+            </span>
+            <span className={clsx(
+              'px-2.5 py-1 rounded-lg text-xs font-medium backdrop-blur-sm',
+              tour.difficulty === 'easy' ? 'bg-green-100/90 text-green-700' :
+              tour.difficulty === 'moderate' ? 'bg-yellow-100/90 text-yellow-700' :
+              'bg-red-100/90 text-red-700'
+            )}>
+              {String(t(`tour.difficulty.${tour.difficulty}`, tour.difficulty))}
+            </span>
+          </div>
+          <div className="absolute top-3 right-3 rtl:right-auto rtl:left-3">
+            <FavoriteButton productType="tour" productId={tour.id} />
+          </div>
+        </div>
+        <div className="p-4">
+          <div className="flex items-center gap-1.5 text-xs text-gray-500 mb-1">
+            <MapPin className="w-3 h-3" />
+            <span>{tour.destination?.city}, {tour.destination?.country}</span>
+          </div>
+          <h3 className="font-semibold text-gray-900 group-hover:text-primary-600 transition-colors line-clamp-1">
+            {tour.name}
+          </h3>
+          <p className="text-sm text-gray-500 mt-1 line-clamp-2">{tour.description}</p>
+          {tour.highlights?.length > 0 && (
+            <div className="flex flex-wrap gap-1 mt-2">
+              {tour.highlights.slice(0, 3).map((h: string, i: number) => (
+                <span key={i} className="text-xs bg-primary-50 text-primary-700 px-2 py-0.5 rounded-full">
+                  {h}
+                </span>
+              ))}
+            </div>
+          )}
+          <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-100">
+            <div className="flex items-center gap-1">
+              <Star className="w-4 h-4 text-accent-500 fill-accent-500" />
+              <span className="text-sm font-medium text-gray-900">{tour.avgRating?.toFixed(1)}</span>
+              <span className="text-xs text-gray-400">({tour.reviewCount})</span>
+            </div>
+            <div className="text-right">
+              <span className="text-xs text-gray-400">{t('tour.fromPrice', 'from')}</span>
+              <p className="text-lg font-bold text-primary-600">{formatCurrency(tour.price, tour.currency)}</p>
+            </div>
+          </div>
+        </div>
+      </motion.div>
+    </Link>
+  );
+
   const renderCard = (item: any) => {
     switch (type) {
       case 'flights': return renderFlightCard(item);
       case 'activities': return renderActivityCard(item);
       case 'cars': return renderCarCard(item);
+      case 'tours': return renderTourCard(item);
       default: return renderHotelCard(item);
     }
   };

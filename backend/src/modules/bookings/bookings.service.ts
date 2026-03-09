@@ -47,25 +47,50 @@ export class BookingsService {
     const booking = await this.findById(bookingId);
 
     // Call supplier to create the booking
-    const adapter = this.supplierRegistry.getAdapter(booking.supplierId);
-    if (adapter) {
-      try {
-        const result = await adapter.createBooking({
-          hotelId: booking.productId,
-          roomId: 'R001',
-          checkIn: booking.checkIn,
-          checkOut: booking.checkOut,
-          guests: booking.guestDetails?.map((g) => ({
-            firstName: g.firstName,
-            lastName: g.lastName,
-            email: g.email || '',
-          })) || [],
-        });
-        booking.supplierBookingRef = result.bookingRef;
-      } catch (error) {
-        this.logger.error(`Supplier booking failed: ${error}`);
-        booking.status = BookingStatus.FAILED;
-        return this.bookingRepo.save(booking);
+    const guestsMapped = booking.guestDetails?.map((g) => ({
+      firstName: g.firstName,
+      lastName: g.lastName,
+      email: g.email || '',
+      phone: g.phone,
+    })) || [];
+
+    if (booking.productType === 'tour') {
+      // Tour booking via tour adapter
+      const tourAdapter = this.supplierRegistry.getTourAdapter(booking.supplierId);
+      if (tourAdapter) {
+        try {
+          const result = await tourAdapter.createBooking({
+            hotelId: booking.productId,
+            roomId: '',
+            checkIn: booking.checkIn,
+            checkOut: booking.checkOut,
+            guests: guestsMapped,
+          });
+          booking.supplierBookingRef = result.bookingRef;
+        } catch (error) {
+          this.logger.error(`Tour supplier booking failed: ${error}`);
+          booking.status = BookingStatus.FAILED;
+          return this.bookingRepo.save(booking);
+        }
+      }
+    } else {
+      // Hotel/other booking via hotel adapter
+      const adapter = this.supplierRegistry.getAdapter(booking.supplierId);
+      if (adapter) {
+        try {
+          const result = await adapter.createBooking({
+            hotelId: booking.productId,
+            roomId: 'R001',
+            checkIn: booking.checkIn,
+            checkOut: booking.checkOut,
+            guests: guestsMapped,
+          });
+          booking.supplierBookingRef = result.bookingRef;
+        } catch (error) {
+          this.logger.error(`Supplier booking failed: ${error}`);
+          booking.status = BookingStatus.FAILED;
+          return this.bookingRepo.save(booking);
+        }
       }
     }
 

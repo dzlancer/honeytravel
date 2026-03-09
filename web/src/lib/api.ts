@@ -1,7 +1,8 @@
 import type {
   User,
   Booking, CreateBookingDto,
-  Hotel, Flight, Activity, CarRental,
+  Hotel, Flight, Activity, CarRental, Tour,
+  TourCalculationRequest, TourCalculationResponse,
   PaymentResult,
   Review, ReviewsResponse, CreateReviewDto,
   Notification as TsaNotification, NotificationsResponse,
@@ -221,6 +222,23 @@ class ApiClient {
     return this.request<CarRental>(`/suppliers/cars/${id}`);
   }
 
+  // Tours
+  searchTours(params: Record<string, string>) {
+    const qs = new URLSearchParams(params).toString();
+    return this.request<{ items: Tour[]; total: number }>(`/suppliers/tours/search?${qs}`);
+  }
+
+  getTour(id: string) {
+    return this.request<Tour>(`/suppliers/tours/${id}`);
+  }
+
+  calculateTourPrice(tourId: string, data: { date: string; adults: number; children?: number; childAges?: number[] }) {
+    return this.request<TourCalculationResponse>(`/suppliers/tours/${tourId}/calculate`, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
   // Reviews
   getProductReviews(productType: string, productId: string, page = 1, limit = 10) {
     return this.request<ReviewsResponse>(`/reviews/product/${productType}/${productId}?page=${page}&limit=${limit}`);
@@ -304,6 +322,43 @@ class ApiClient {
 
   sendCampaign(id: string) {
     return this.request<Campaign>(`/admin/campaigns/${id}/send`, { method: 'PUT' });
+  }
+
+  // System Config (Super Admin)
+  getSystemConfigs(category?: string) {
+    const qs = category ? `?category=${category}` : '';
+    return this.request<any[]>(`/system-config${qs}`);
+  }
+
+  updateSystemConfig(key: string, value: string) {
+    return this.request<any>(`/system-config/${key}`, {
+      method: 'PUT',
+      body: JSON.stringify({ value }),
+    });
+  }
+
+  getAuditLogs(page = 1, limit = 20, entityType?: string) {
+    const params = new URLSearchParams({ page: String(page), limit: String(limit) });
+    if (entityType) params.set('entityType', entityType);
+    return this.request<{ items: any[]; total: number }>(`/system-config/audit-log?${params}`);
+  }
+
+  // Admin Suppliers
+  getAdminSuppliers() {
+    return this.request<any[]>('/admin/suppliers');
+  }
+
+  updateAdminSupplier(id: string, data: Record<string, any>) {
+    return this.request<any>(`/admin/suppliers/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+  }
+
+  testSupplierConnection(id: string) {
+    return this.request<{ success: boolean; message: string }>(`/admin/suppliers/${id}/test`, {
+      method: 'POST',
+    });
   }
 }
 

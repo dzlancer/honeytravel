@@ -34,7 +34,13 @@ export class Supplier {
   @Column({ default: 0 })
   priority: number; // higher = preferred
 
-  @Column({ type: 'jsonb', nullable: true })
+  @Column({ type: 'real', default: 0 })
+  markupPercentage: number;
+
+  @Column({ default: false })
+  isMock: boolean;
+
+  @Column({ type: 'simple-json', nullable: true })
   config: Record<string, unknown>;
 
   @CreateDateColumn()

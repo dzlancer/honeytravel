@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Put, Body, Param, Query, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Put, Body, Param, Query, UseGuards, Request } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../../common/guards/roles.guard';
@@ -7,6 +7,10 @@ import { UsersService } from '../users/users.service';
 import { BookingsService } from '../bookings/bookings.service';
 import { MarketingService } from '../marketing/marketing.service';
 import { LoyaltyService } from '../loyalty/loyalty.service';
+import { SuppliersService } from '../suppliers/suppliers.service';
+import { SupplierRegistryService } from '../suppliers/supplier-registry.service';
+import { SystemConfigService } from '../system-config/system-config.service';
+import { UpdateSupplierDto } from './dto/update-supplier.dto';
 
 @ApiTags('admin')
 @ApiBearerAuth()
@@ -19,6 +23,9 @@ export class AdminController {
     private bookingsService: BookingsService,
     private marketingService: MarketingService,
     private loyaltyService: LoyaltyService,
+    private suppliersService: SuppliersService,
+    private supplierRegistry: SupplierRegistryService,
+    private systemConfigService: SystemConfigService,
   ) {}
 
   @Get('dashboard')
@@ -100,5 +107,66 @@ export class AdminController {
   @ApiOperation({ summary: 'Award bonus loyalty points to a user' })
   async awardBonus(@Body() body: { userId: string; points: number; description: string }) {
     return this.loyaltyService.addBonus(body.userId, body.points, body.description);
+  }
+
+  // ─── Supplier Management ─────────────────────────────────
+
+  @Get('suppliers')
+  @ApiOperation({ summary: 'List all suppliers with config' })
+  async listSuppliers() {
+    return this.suppliersService.findAllSuppliers();
+  }
+
+  @Put('suppliers/:id')
+  @ApiOperation({ summary: 'Update a supplier configuration' })
+  async updateSupplier(
+    @Param('id') id: string,
+    @Body() dto: UpdateSupplierDto,
+    @Request() req: any,
+  ) {
+    // Get old state for audit
+    const oldSupplier = await this.suppliersService.findSupplierById(id);
+    const oldSnapshot = {
+      isActive: oldSupplier.isActive,
+      baseUrl: oldSupplier.baseUrl,
+      markupPercentage: oldSupplier.markupPercentage,
+      priority: oldSupplier.priority,
+      isMock: oldSupplier.isMock,
+      rateLimit: oldSupplier.rateLimit,
+      timeout: oldSupplier.timeout,
+    };
+
+    // Apply update
+    const updated = await this.suppliersService.updateSupplier(id, dto);
+
+    // Audit log
+    await this.systemConfigService.createAuditLog({
+      entityType: 'supplier',
+      entityId: id,
+      action: 'update',
+      oldValue: JSON.stringify(oldSnapshot),
+      newValue: JSON.stringify({
+        isActive: updated.isActive,
+        baseUrl: updated.baseUrl,
+        markupPercentage: updated.markupPercentage,
+        priority: updated.priority,
+        isMock: updated.isMock,
+        rateLimit: updated.rateLimit,
+        timeout: updated.timeout,
+      }),
+      userId: req.user.sub,
+      userEmail: req.user.email,
+    });
+
+    // Runtime reload
+    await this.supplierRegistry.reloadAdapter(id);
+
+    return updated;
+  }
+
+  @Post('suppliers/:id/test')
+  @ApiOperation({ summary: 'Test a supplier connection' })
+  async testSupplierConnection(@Param('id') id: string) {
+    return this.suppliersService.testSupplierConnection(id);
   }
 }

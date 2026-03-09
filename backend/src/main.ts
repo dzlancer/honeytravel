@@ -5,6 +5,15 @@ import { AppModule } from './app.module';
 import helmet from 'helmet';
 import * as compression from 'compression';
 
+// Prevent Redis connection errors from crashing the process in dev
+process.on('unhandledRejection', (reason: any) => {
+  if (reason?.code === 'ECONNREFUSED' || reason?.message?.includes('ECONNREFUSED')) {
+    console.warn('[WARN] Redis not available — background jobs disabled');
+    return;
+  }
+  console.error('Unhandled rejection:', reason);
+});
+
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
@@ -12,7 +21,10 @@ async function bootstrap() {
   app.use(compression());
 
   app.enableCors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+    origin: [
+      process.env.FRONTEND_URL || 'http://localhost:3000',
+      'http://localhost:3002',
+    ],
     credentials: true,
   });
 

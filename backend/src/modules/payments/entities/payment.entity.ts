@@ -41,10 +41,10 @@ export class Payment {
   @Column({ default: 'USD' })
   currency: string;
 
-  @Column({ type: 'enum', enum: PaymentStatus, default: PaymentStatus.PENDING })
+  @Column({ type: 'text', default: PaymentStatus.PENDING })
   status: PaymentStatus;
 
-  @Column({ type: 'enum', enum: PaymentMethod, default: PaymentMethod.CARD })
+  @Column({ type: 'text', default: PaymentMethod.CARD })
   method: PaymentMethod;
 
   @Column({ nullable: true })
@@ -53,7 +53,7 @@ export class Payment {
   @Column({ nullable: true })
   stripeCustomerId: string;
 
-  @Column({ type: 'jsonb', nullable: true })
+  @Column({ type: 'simple-json', nullable: true })
   metadata: Record<string, string>;
 
   @Column({ nullable: true })

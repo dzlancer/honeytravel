@@ -22,7 +22,7 @@ export class Notification {
   @Column('uuid')
   userId: string;
 
-  @Column({ type: 'enum', enum: NotificationType })
+  @Column({ type: 'text' })
   type: NotificationType;
 
   @Column()
@@ -31,16 +31,16 @@ export class Notification {
   @Column({ type: 'text' })
   body: string;
 
-  @Column({ type: 'enum', enum: NotificationStatus, default: NotificationStatus.PENDING })
+  @Column({ type: 'text', default: NotificationStatus.PENDING })
   status: NotificationStatus;
 
   @Column({ nullable: true })
   event: string; // booking.created, cart.abandoned, etc.
 
-  @Column({ type: 'jsonb', nullable: true })
+  @Column({ type: 'simple-json', nullable: true })
   metadata: Record<string, unknown>;
 
-  @Column({ type: 'timestamptz', nullable: true })
+  @Column({ type: 'datetime', nullable: true })
   readAt: Date | null;
 
   @CreateDateColumn()

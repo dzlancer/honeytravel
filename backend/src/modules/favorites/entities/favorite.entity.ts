@@ -19,7 +19,7 @@ export class Favorite {
   @JoinColumn({ name: 'userId' })
   user: User;
 
-  @Column({ type: 'enum', enum: ProductType })
+  @Column({ type: 'text' })
   productType: ProductType;
 
   @Column()
